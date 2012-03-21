@@ -207,9 +207,16 @@ class WPQuadratumWidget extends WP_Widget {
 			</script>';
 
 			$content .= '</a>';
+/*
 			$content .= '<div class="wp-quadratum-venue-name"><h4 class="widget-title">'
 				. 'Last seen at ' . $checkin->venue->name
 				. '</h4></div>';
+*/
+			$content .= '<div class="wp-quadratum-venue-name"><h5>'
+				. 'Last seen at ' . $checkin->venue->name
+				. ' on '
+				. date ("d M Y G:i T", $checkin->createdAt)
+				. '</h5></div>';
 
 			$content .= '</div>';
 			break;	// Not really needed as we only return a single checkin item
