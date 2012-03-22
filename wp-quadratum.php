@@ -10,14 +10,31 @@ License: GPL2
 Text Domain: wp-quadratum
 */
 
-//define ('WPQUADRATUM_VERSION', '10');
 define ('WPQUADRATUM_URL', plugin_dir_url (__FILE__));
 define ('WPQUADRATUM_PATH', plugin_dir_path (__FILE__));
 
-require_once (WPQUATRADUM_PATH . '/wp-plugin-base/wp-plugin-base.php');
+/*
+ * Determine WordPress directory constants.
+ * See http://codex.wordpress.org/Determining_Plugin_and_Content_Directories
+ */
+
+if (!defined ('WP_CONTENT_URL'))
+	define ('WP_CONTENT_URL', WP_SITEURL . '/wp-content');
+if (!defined ('WP_CONTENT_DIR'))
+	define ('WP_CONTENT_DIR', ABSPATH . 'wp-content');
+if (!defined ('WP_PLUGIN_URL'))
+	define ('WP_PLUGIN_URL', WP_CONTENT_URL. '/plugins');
+if (!defined ('WP_PLUGIN_DIR'))
+	define ('WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins');
+if (!defined ('WPMU_PLUGIN_URL'))
+	define ('WPMU_PLUGIN_URL', WP_CONTENT_URL. '/mu-plugins');
+if (!defined ('WPMU_PLUGIN_DIR'))
+	define ('WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins');
+
+require_once (WPQUADRATUM_PATH . '/wp-plugin-base/wp-plugin-base.php');
 require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
 
-class WPQuadratum extends WPPluginBase {
+class WPQuadratum extends WP_PluginBase {
 	static $instance;
 	
 	public $wp_quadratum_settings = array ();
@@ -75,12 +92,23 @@ class WPQuadratum extends WPPluginBase {
 		}
 	}
 	
-	function get_option ($key='') {
-		$options = get_options (self::OPTIONS);
-		if (isset ($options[$key])) {
-			return $options[$key];
+	function get_option () {
+		$num_args = func_num_args ();
+		$options = get_option (self::OPTIONS);
+
+		if ($num_args > 0) {
+			$args = func_get_args ();
+			$key = $args[0];
+			$value = "";
+			if (isset ($options[$key])) {
+				$value = $options[$key];
+			}
+			return $value;
 		}
-		return $options;
+		
+		else {
+			return $options;
+		}
 	}
 
 	function set_option ($key, $value) {
@@ -91,8 +119,9 @@ class WPQuadratum extends WPPluginBase {
 
 	function admin_init () {
 		$this->admin_upgrade ();
+		$settings = $this->get_option ();
 
-		if (empty ($this->get_option (['oauth_token']))) {
+		if (empty ($settings['oauth_token'])) {
 			$this->hook ('admin_notices');
 		}
 	}	
@@ -100,7 +129,7 @@ class WPQuadratum extends WPPluginBase {
 	function admin_notices () {
 		if (current_user_can ('manage_options')) {
 			$content = sprintf (__('You need to grant WP Quadratum access to your Foursquare account to show your checkins; you can go to the <a href="%s">WP Quadratum Settings And Options page</a> to do this now'),
-				admin_url ('options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php'));
+				admin_url ('options-general.php?page=wp-quadratum/wp-quadratum.php'));
 
 			echo '<div class="error">' . $content . '</div>';
 		}
@@ -144,7 +173,7 @@ class WPQuadratum extends WPPluginBase {
 	}
 
 	function admin_settings_link ($links) {
-		$settings_link = '<a href="options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php">'
+		$settings_link = '<a href="options-general.php?page=wp-quadratum/wp-quadratum.php">'
 			. __('Settings')
 			. '</a>';
 		array_unshift ($links, $settings_link);
@@ -247,7 +276,7 @@ class WPQuadratum extends WPPluginBase {
 			if (!empty ($options['client_id'])) {
 				$fh = new FoursquareHelper ($options['client_id'],
 					$options['client_secret'],
-					plugins_url () . '/' . dirname (plugin_basename (__FILE__)) . '/wp-quadratum-callback.php');
+					plugins_url () . '/' . dirname (plugin_basename (__FILE__)) . '/includes/wp-quadratum-callback.php');
 				$auth_settings .= '<p class="submit">'
 					. '<a href="' . $fh->authentication_link () . '" class="button-primary">'
 					. __('Connect to Foursquare') . '</a>'
@@ -300,7 +329,7 @@ class WPQuadratum extends WPPluginBase {
 			}
 		}
 
-		$options - $this->get_option ();
+		$options = $this->get_option ();
 		return $options;
 	}
 	
