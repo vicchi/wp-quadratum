@@ -1,6 +1,6 @@
 <?php
 
-require_once (WPQUADRATUM_PATH . '/includes/foursquare-helper.php');
+require_once (WPQUADRATUM_PATH . '/foursquare-helper/foursquare-helper.php');
 
 class WPQuadratumWidget extends WP_Widget {
 	function __construct() {
@@ -127,7 +127,7 @@ class WPQuadratumWidget extends WP_Widget {
 	}
 	
 	function show_checkin_map($instance) {
-		$content = "";
+		$content = array ();
 
 		$wp_quadratum_settings = get_option ('wp_quadratum_settings');
 
@@ -163,27 +163,31 @@ class WPQuadratumWidget extends WP_Widget {
 				$icon_url = $category->icon;
 				break;
 			}
-				
-			$content .= '<div id="wp-quadratum-container-'
+
+			if (is_object ($icon_url)) {
+				$icon_url = $icon_url->prefix . '32' . $icon_url->name;
+			}
+			
+			$content[] = '<div id="wp-quadratum-container-'
 				. $instance['id']
 				. '" class="wp-quadratum-container" style="width:'
 				. $instance['width']
 				. 'px;">';
 
-			$content .= '<a href="'
+			$content[] = '<a href="'
 				. $venue_url
 				. '" target="_blank">';
 				
-			$content .= '<div id="'
+			$content[] = '<div id="'
 				. $map_id
 				. '" class="wp-quadratum-map" style="width:'
 				. $instance['width']
 				. 'px; height:'
 				. $instance['height']
 				. 'px;">';
-			$content .= '</div>';
+			$content[] = '</div>';
 			
-			$content .= '<script type="text/javascript">
+			$content[] = '<script type="text/javascript">
 			nokia.maps.util.ApplicationContext.set (
 				{
 					"appId": "UFWp5rP0M5fBcQzbsbRv",
@@ -206,23 +210,24 @@ class WPQuadratumWidget extends WP_Widget {
 			map.objects.add (marker);
 			</script>';
 
-			$content .= '</a>';
-/*
-			$content .= '<div class="wp-quadratum-venue-name"><h4 class="widget-title">'
-				. 'Last seen at ' . $checkin->venue->name
-				. '</h4></div>';
-*/
-			$content .= '<div class="wp-quadratum-venue-name"><h5>'
-				. 'Last seen at ' . $checkin->venue->name
+			$content[] = '</a>';
+
+			$content[] = '<div class="wp-quadratum-venue-name"><h5>'
+				. 'Last seen at '
+				. '<a href="'
+				. $venue_url
+				. '" target="_blank">'
+				. $checkin->venue->name
+				. '</a>'
 				. ' on '
 				. date ("d M Y G:i T", $checkin->createdAt)
 				. '</h5></div>';
 
-			$content .= '</div>';
+			$content[] = '</div>';
 			break;	// Not really needed as we only return a single checkin item
 		}
 
-		return $content;
+		return implode ('', $content);
 	}
 }
 ?>
