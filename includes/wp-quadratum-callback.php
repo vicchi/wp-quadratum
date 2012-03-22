@@ -23,7 +23,7 @@ if (array_key_exists ('code', $_GET) && !function_exists ('get_bloginfo')) {
 	update_option ('wp_quadratum_settings', $wp_quadratum_settings);
 
 	$redirect_url = get_bloginfo ('wpurl')
-		. '/wp-admin/options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php';
+		. '/wp-admin/options-general.php?page=wp-quadratum/wp-quadratum.php';
 
 	wp_redirect ($redirect_url);
 }
