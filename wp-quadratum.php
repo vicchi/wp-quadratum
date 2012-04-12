@@ -34,10 +34,15 @@ if (!defined ('WPMU_PLUGIN_DIR'))
 require_once (WPQUADRATUM_PATH . '/wp-plugin-base/wp-plugin-base.php');
 require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
 
+define ('WPNAUTH_PLUGIN_HELPER', WP_PLUGIN_DIR . '/wp-nokia-auth/wp-nokia-auth-helper.php');
+define ('WPNAUTH_PLUGIN_PATH', 'wp-nokia-auth/wp-nokia-auth.php');
+
+if (file_exists (WPNAUTH_PLUGIN_HELPER)) {
+	include_once (WPNAUTH_PLUGIN_HELPER);
+}
+
 class WPQuadratum extends WP_PluginBase {
 	static $instance;
-	
-	public $wp_quadratum_settings = array ();
 	
 	const OPTIONS = 'wp_quadratum_settings';
 	const WPQUADRATUM_VERSION = '10';
@@ -61,7 +66,6 @@ class WPQuadratum extends WP_PluginBase {
 			$this->hook ('admin_print_styles');
 			add_filter ('plugin_action_links_' . plugin_basename (__FILE__),
 				array ($this, 'admin_settings_link'));
-			
 		}
 	}
 	
@@ -75,10 +79,10 @@ class WPQuadratum extends WP_PluginBase {
 	}
 	
 	function add_settings () {
-		$this->wp_quadratum_settings = $this->get_option ();
+		$settings = $this->get_option ();
 
-		if (!is_array ($this->wp_quadratum_settings)) {
-			$this->wp_quadratum_settings = apply_filters ('wp_quadratum_default_settings',
+		if (!is_array ($settings)) {
+			$settings = apply_filters ('wp_quadratum_default_settings',
 				array (
 					"installed" => "on",
 					"version" => WPQUADRATUM_VERSION,
@@ -88,7 +92,7 @@ class WPQuadratum extends WP_PluginBase {
 					)
 				);
 
-			update_option (self::OPTIONS, $this->wp_quadratum_settings);
+			update_option (self::OPTIONS, $settings);
 		}
 	}
 	
@@ -140,7 +144,7 @@ class WPQuadratum extends WP_PluginBase {
 			$page_title = __('WP Quadratum');
 			$menu_title = __('WP Quadratum');
 			add_options_page ($page_title, $menu_title, 'manage_options', __FILE__,
-				array ($this, 'admin_settings'));
+				array ($this, 'admin_display_settings'));
 			
 		}
 	}
@@ -220,28 +224,32 @@ class WPQuadratum extends WP_PluginBase {
 		}
 	}
 	
-	function admin_settings () {
-		$options = $this->get_option ();
-
-		$wrapped_content = "";
-		$auth_settings = "";
-		$auth_title = __('Authentication Settings');
+	function admin_display_settings () {
+		$options = $this->admin_save_settings ();
+		
+		$auth_plugin_installed = file_exists (WPNAUTH_PLUGIN_HELPER);
+		$auth_plugin_active = is_plugin_active (WPNAUTH_PLUGIN_PATH);
+		
+		$wrapped_content = array ();
+		$foursquare_settings = array ();
+		$foursquare_title = __('Foursquare OAuth Settings');
+		$nokia_settings = array ();
+		$nokia_title = __('Nokia Location API Settings');
 
 		if (empty ($options['oauth_token'])) {
-			$auth_title .= __(' (Not Authenticated With Foursquare)');
+			$foursquare_title .= __(' (Not Authenticated)');
 		}
 
 		else {
-			$auth_title .= __(' (Successfully Authenticated With Foursquare)');
+			$foursquare_title .= __(' (Successfully Authenticated)');
 		}
 
-		//$auth_settings .= '<p><strong>' . __('Authentication Status') . '</strong></p>';
 		if (empty ($options['oauth_token'])) {
-			$auth_settings .= '<div class="wp-quadratum-error">'
+			$foursquare_settings[] = '<div class="wp-quadratum-error">'
 				. __('You are not currently authenticated with the Foursquare API.')
 				. '</div>';
 
-			$auth_settings .= '<div><p>'
+			$foursquare_settings[] = '<div><p>'
 				. __('To display your Foursquare checkins, WP Quadratum needs to be authorised to access your Foursquare account information; this is a simple, safe and secure 3 step process. QP Quadratum never sees your account login information and cannot store any personally identifiable information.')
 				. '<p><strong>'
 				. sprintf (__('Step 1. Register this WordPress site as a Foursquare application on the <a target="_blank" href="%s">Foursquare OAuth Consumer Registration</a> page'), 'https://foursquare.com/oauth/register')
@@ -258,26 +266,26 @@ class WPQuadratum extends WP_PluginBase {
 				. __('Step 2. Copy and paste the supplied Client ID and Client Secret below')
 				. '</strong></p>';
 
-			$auth_settings .= '<p><strong>' . __('Foursquare Client ID') . '</strong><br />
+			$foursquare_settings[] = '<p><strong>' . __('Foursquare Client ID') . '</strong><br />
 				<input type="text" name="wp_quadratum_client_id" id="wp-quadratum-client-id" value="' . $options['client_id'] . '" /><br />
 				<small>Your Foursquare API Client ID</small></p>';
 
-			$auth_settings .= '<p><strong>' . __('Foursquare Client Secret') . '</strong><br />
+			$foursquare_settings[] = '<p><strong>' . __('Foursquare Client Secret') . '</strong><br />
 				<input type="text" name="wp_quadratum_client_secret" id="wp-quadratum-client-secret" value="' . $options['client_secret'] . '" /><br />
 				<small>Your Foursquare API Client Secret</small></p>';
 
-			$auth_settings .= '<p><strong>'
+			$foursquare_settings[] = '<p><strong>'
 			. __('Step 3. You should now be authorised and ready to go; click on the Connect button below.')
 			. '</strong></p>';
 
-			$auth_settings .= '</p></div>';
+			$foursquare_settings[] = '</p></div>';
 
-			$options = $this->admin_process_settings ();
+//			$options = $this->admin_save_settings ();
 			if (!empty ($options['client_id'])) {
 				$fh = new FoursquareHelper ($options['client_id'],
 					$options['client_secret'],
 					plugins_url () . '/' . dirname (plugin_basename (__FILE__)) . '/includes/wp-quadratum-callback.php');
-				$auth_settings .= '<p class="submit">'
+				$foursquare_settings[] = '<p class="submit">'
 					. '<a href="' . $fh->authentication_link () . '" class="button-primary">'
 					. __('Connect to Foursquare') . '</a>'
 					. '</p>';
@@ -286,39 +294,86 @@ class WPQuadratum extends WP_PluginBase {
 		}
 
 		else {
-			$auth_settings .= '<div class="wp-quadratum-success">'
+			$foursquare_settings[] = '<div class="wp-quadratum-success">'
 				. __('You are currently successfully authenticated with the Foursquare API.')
 				. '</div>';
 
 		}
 
+		if ($auth_plugin_installed) {
+			if ($auth_plugin_active) {
+				$helper = new WPNokiaAuthHelper ();
+				
+				$nokia_settings[] = '<div class="wp-quadratum-success">'
+					. __('WP Nokia Auth is installed and active')
+					. '</div>';
+				$nokia_settings[] = '<p><strong>' . __('App ID') . '</strong></p>
+				<input type="text" size="30" disabled value="' . $helper->get_id () . '"><br />';
+				$nokia_settings[] = '<p><strong>' . __('App Token') . '</strong></p>
+					<input type="text" size="30" disabled value="' . $helper->get_token () . '"><br />';
+				$nokia_settings[] = '<p><strong>' . __('App Secret') . '</strong></p>
+					<input type="text" size="30" disabled value="' . $helper->get_secret () . '"><br />';
+			}
+			
+			else {
+				$nokia_settings[] = '<div class="wp-quadratum-warning">'
+					. __('WP Nokia Auth is installed but not currently active')
+					. '</div>';
+				
+			}
+		}
+
+		else {
+			$nokia_settings[] = '<p>'
+				. sprintf (__('You can use the <a href="%1$s">WP Nokia Auth plugin</a> to manage your Nokia Location Platform API credentials. Or you can obtain Nokia Location API credentials from the <a href="%2$s">Nokia API Registration</a> site.'), 'http://wordpress.org/extend/plugins/wp-nokia-auth/', 'http://api.developer.nokia.com/')
+				. '</p>';
+			$nokia_settings[] = '<p><strong>' . __('Application ID') . '</strong><br />
+				<input type="text" name="wp_quadratum_app_id" id="wp_quadratum_app_id" value="' . $options['app_id'] . '" size="35" /><br />
+				<small>' . __('Enter your registered Nokia Location API App ID') . '</small></p>';
+
+			$nokia_settings[] = '<p><strong>' . __('Application Token') . '</strong><br />
+				<input type="text" name="wp_quadratum_app_token" id="wp_quadratum_app_token" value="' . $options['app_token'] . '" size="35" /><br />
+				<small>' . __('Enter your registered Nokia Location API App Token') . '</small></p>';
+
+			$nokia_settings[] = '<p><strong>' . __('Application Secret') . '</strong><br />
+				<input type="text" name="wp_quadratum_app_secret" id="wp_quadratum_app_secret" value="' . $options['app_secret'] . '" size="35" /><br />
+				<small>' . __('Enter your registered Nokia Location API App Secret') . '</small></p>';
+
+		}
+
 		if (function_exists ('wp_nonce_field')) {
-			$wrapped_content .= wp_nonce_field (
+			$wrapped_content[] = wp_nonce_field (
 				'wp-quadratum-update-options',
 				'_wpnonce',
 				true,
 				false);
 		}
 
-		$wrapped_content .= $this->admin_postbox ('wp-quadratum-authentication-settings',
-			__('Authentication Settings'), $auth_settings);
+		$wrapped_content[] = $this->admin_postbox ('wp-quadratum-foursquare-settings',
+			$foursquare_title, implode('', $foursquare_settings));
 
-		$this->admin_wrap (__('WP Quadratum Settings And Options'), $wrapped_content);
+		$wrapped_content[] = $this->admin_postbox ('wp-quadratum-nokia-settings',
+			$nokia_title, implode ('', $nokia_settings));
+			
+		$this->admin_wrap (__('WP Quadratum Settings And Options'), implode ('', $wrapped_content));
 	}
 
 	function admin_option ($field) {
 		return (isset ($_POST[$field]) ? $_POST[$field] : "");
 	}
 
-	function admin_process_settings () {
+	function admin_save_settings () {
 		$options = $this->get_option ();
 
 		if (!empty ($_POST['wp_quadratum_option_submitted'])) {
 			if (strstr ($_GET['page'], 'wp-quadratum') &&
 					check_admin_referer ('wp-quadratum-update-options')) {
-
 				$options['client_id'] = $this->admin_option('wp_quadratum_client_id');
 				$options['client_secret'] = $this->admin_option('wp_quadratum_client_secret');
+
+				$options['app_id'] = html_entity_decode ($this->admin_option ('wp_quadratum_app_id'));
+				$options['app_token'] = html_entity_decode ($this->admin_option ('wp_quadratum_app_token'));
+				$options['app_secret'] = html_entity_decode ($this->admin_option ('wp_quadratum_app_secret'));
 
 				echo "<div id=\"updatemessage\" class=\"updated fade\"><p>";
 				_e('WP Quadratum Settings And Options Updated.');
@@ -388,55 +443,8 @@ class WPQuadratum extends WP_PluginBase {
 	    </div>
 	<?php	
 	}
-	
 }	// end-class WPQuadratum
 
-$_wp_quadratum_instance = new WPQuadratum;
-
-//require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-admin.php');
-//require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
-
-/*
-function wp_quadratum_add_defaults() {
-	$wp_quadratum_settings = NULL;
-	
-	$wp_quadratum_settings = get_option ('wp_quadratum_settings');
-	if (!is_array ($wp_quadratum_settings)) {
-		$wp_quadratum_settings = array (
-			"installed" => "on",
-			"version" => WPQUADRATUM_VERSION,
-			"client_id" => "",
-			"client_secret" => "",
-			"oauth_token" => ""
-			);
-			
-		update_option ('wp_quadratum_settings', $wp_quadratum_settings);
-	}
-}
-*/
-
-/*
-function wp_quadratum_widgets_init() {
-	return register_widget ('WPQuadratumWidget');
-}
-*/
-
-/*
-function wp_quadratum_init() {
-	$lang_dir = basename (dirname (__FILE__)) . DIRECTORY_SEPARATOR . 'lang';
-	load_plugin_textdomain ('wp-quadratum', false, $lang_dir);
-}
-*/
-
-//register_activation_hook (__FILE__, 'wp_quadratum_add_defaults');
-
-//add_action ('admin_menu', 'wp_quadratum_add_options_subpanel');
-//add_action ('init', 'wp_quadratum_init');
-//add_action ('admin_init', 'wp_quadratum_admin_init');
-//add_action ('admin_print_scripts', 'wp_quadratum_add_admin_scripts');
-//add_action ('admin_print_styles', 'wp_quadratum_add_admin_styles');
-//add_action ('widgets_init', 'wp_quadratum_widgets_init');
-
-//add_filter ('plugin_action_links_' . plugin_basename (__FILE__), 'wp_quadratum_settings_link');
+$__wp_quadratum_instance = new WPQuadratum;
 
 ?>
