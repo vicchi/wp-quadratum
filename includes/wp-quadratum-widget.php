@@ -129,17 +129,17 @@ class WPQuadratumWidget extends WP_Widget {
 	function show_checkin_map($instance) {
 		$content = array ();
 
-		$wp_quadratum_settings = get_option ('wp_quadratum_settings');
+		$options = get_option ('wp_quadratum_settings');
 
-		$client_id = $wp_quadratum_settings['client_id'];
-		$client_secret = $wp_quadratum_settings['client_secret'];
+		$client_id = $options['client_id'];
+		$client_secret = $options['client_secret'];
 		$redirect_url = plugins_url ()
 			. '/'
 			. dirname (plugin_basename (__FILE__))
 			. '/wp-quadratum-callback.php';
 
 		$fh = new FoursquareHelper ($client_id, $client_secret, $redirect_url);
-		$fh->set_access_token ($wp_quadratum_settings['oauth_token']);
+		$fh->set_access_token ($options['oauth_token']);
 		$params = array (
 			'limit' => 1
 			);
@@ -187,14 +187,43 @@ class WPQuadratumWidget extends WP_Widget {
 				. 'px;">';
 			$content[] = '</div>';
 			
-			$content[] = '<script type="text/javascript">
-			nokia.maps.util.ApplicationContext.set (
-				{
-					"appId": "UFWp5rP0M5fBcQzbsbRv",
-					"authenticationToken": "jARQ6fqMPoTgSjBK11UM"
+			$app_id = NULL;
+			$app_token = NULL;
+			
+			if (WPQuadratum::is_wpna_installed () && WPQuadratum::is_wpna_active ()) {
+				$helper = new WPNokiaAuthHelper ();
+				
+				$tmp = $helper->get_id ();
+				if (!empty ($tmp)) {
+					$app_id = $tmp;
 				}
-			);
-			var coords = new nokia.maps.geo.Coordinate (' . $location->lat . ',' . $location->lng . ');
+				
+				$tmp = $helper->get_token ();
+				if (!empty ($tmp)) {
+					$app_token = $tmp;
+				}
+			}
+			
+			else {
+				if (!empty ($options['app_id'])) {
+					$app_id = $options['app_id'];
+				}
+				if (!empty ($options['app_token'])) {
+					$app_token = $options['app_token'];
+				}
+			}
+			
+			if (!empty ($app_id) && !empty ($app_id)) {
+				$content[] = '<script type="text/javascript">
+				nokia.maps.util.ApplicationContext.set (
+					{
+						"appId": "' . $app_id . '",
+						"authenticationToken": "' . $app_token . '"
+					}
+				);';
+			}
+
+			$content[] = 'var coords = new nokia.maps.geo.Coordinate (' . $location->lat . ',' . $location->lng . ');
 			var map = new nokia.maps.map.Display (
 				document.getElementById ("' . $map_id . '"),
 				{
