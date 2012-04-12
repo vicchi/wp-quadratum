@@ -41,6 +41,8 @@ if (file_exists (WPNAUTH_PLUGIN_HELPER)) {
 	include_once (WPNAUTH_PLUGIN_HELPER);
 }
 
+include_once (ABSPATH . 'wp-admin/includes/plugin.php');
+
 class WPQuadratum extends WP_PluginBase {
 	static $instance;
 	
@@ -51,6 +53,14 @@ class WPQuadratum extends WP_PluginBase {
 		self::$instance = $this;
 		
 		$this->hook ('plugins_loaded');
+	}
+
+	static function is_wpna_installed () {
+		return file_exists (WPNAUTH_PLUGIN_HELPER);
+	}
+
+	static function is_wpna_active () {
+		return is_plugin_active (WPNAUTH_PLUGIN_PATH);
 	}
 
 	function plugins_loaded () {
@@ -227,8 +237,10 @@ class WPQuadratum extends WP_PluginBase {
 	function admin_display_settings () {
 		$options = $this->admin_save_settings ();
 		
-		$auth_plugin_installed = file_exists (WPNAUTH_PLUGIN_HELPER);
-		$auth_plugin_active = is_plugin_active (WPNAUTH_PLUGIN_PATH);
+//		$auth_plugin_installed = file_exists (WPNAUTH_PLUGIN_HELPER);
+//		$auth_plugin_active = is_plugin_active (WPNAUTH_PLUGIN_PATH);
+		$auth_plugin_installed = self::is_wpna_installed ();
+		$auth_plugin_active = self::is_wpna_active ();
 		
 		$wrapped_content = array ();
 		$foursquare_settings = array ();
@@ -280,7 +292,6 @@ class WPQuadratum extends WP_PluginBase {
 
 			$foursquare_settings[] = '</p></div>';
 
-//			$options = $this->admin_save_settings ();
 			if (!empty ($options['client_id'])) {
 				$fh = new FoursquareHelper ($options['client_id'],
 					$options['client_secret'],
