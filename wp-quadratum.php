@@ -237,8 +237,6 @@ class WPQuadratum extends WP_PluginBase {
 	function admin_display_settings () {
 		$options = $this->admin_save_settings ();
 		
-//		$auth_plugin_installed = file_exists (WPNAUTH_PLUGIN_HELPER);
-//		$auth_plugin_active = is_plugin_active (WPNAUTH_PLUGIN_PATH);
 		$auth_plugin_installed = self::is_wpna_installed ();
 		$auth_plugin_active = self::is_wpna_active ();
 		
@@ -413,14 +411,6 @@ class WPQuadratum extends WP_PluginBase {
 		return $postbox_wrap;
 	}
 
-	function admin_show_colophon() {
-		$content = '<p>'
-			. __('WP Quadratum is named after the Latin words quattor, meaning four and quadratum, meaning square.')
-			. '</p>';
-
-		return $this->admin_postbox ('wp-quadratum-colophon', __('Colophon'), $content);
-	}
-
 	function admin_wrap ($title, $content) {
 	?>
 	    <div class="wrap">
@@ -443,9 +433,8 @@ class WPQuadratum extends WP_PluginBase {
 	                  <div class="metabox-holder">	
 	                    <div class="meta-box-sortables">
 	                    <?php
-							//echo wp_biographia_show_help_and_support ();
+							echo $this->admin_help_and_support ();
 							echo $this->admin_show_colophon ();
-							//echo wp_biographia_show_acknowledgements ();
 	                    ?>
 	                    </div>
 	                </div>
@@ -454,6 +443,71 @@ class WPQuadratum extends WP_PluginBase {
 	    </div>
 	<?php	
 	}
+
+	/**
+	 * Emits the plugin's help/support side-box for the plugin's admin settings/options page.
+	 */
+
+	function admin_help_and_support () {
+		$email_address = antispambot ("gary@vicchi.org");
+
+		$content = '<p>'
+			. __('For help and support with WP Quadratum, here\'s what you can do:')
+			. '<ul>'
+			. '<li>'
+			. sprintf (__('Firstly ... take a look at <a href="%s">this</a> before firing off a question.'), 'http://www.vicchi.org/2012/03/31/asking-for-wordpress-plugin-help-and-support-without-tears/')
+			. '</li>'
+			. '<li>'
+			. __('Then ... ask a question on the <a href="http://wordpress.org/tags/wp-quadratum?forum_id=10">WordPress support forum</a>; this is by far the best way so that other users can follow the conversation.')
+			. '</li>'
+			. '<li>'
+			. __('Or ... ask me a question on Twitter; I\'m <a href="http://twitter.com/vicchi">@vicchi</a>.')
+			. '</li>'
+			. '<li>'
+			. sprintf (__('Or ... drop me an <a href="mailto:%s">email </a>instead.'), $email_address)
+			. '</li>'
+			. '</ul>'
+			. '</p>'
+			. '<p>'
+			. __('But ... help and support is a two way street; here\'s what you might want to do:')
+			. '<ul>'
+			. '<li>'
+			. sprintf (__('If you like this plugin and use it on your WordPress site, or if you write about it online, <a href="http://www.vicchi.org/codeage/wp-quadratum/">link to the plugin</a> and drop me an <a href="mailto:%s">email</a> telling me about this.'), $email_address)
+			. '</li>'
+			. '<li>'
+			. __('Rate the plugin on the <a href="http://wordpress.org/extend/plugins/wp-quadratum/">WordPress plugin repository</a>.')
+			. '</li>'
+			. '<li>'
+			. __('WP Quadratum is both free as in speech and free as in beer. No donations are required; <a href="http://www.vicchi.org/codeage/donate/">here\'s why</a>.')
+			. '</li>'
+			. '</ul>'
+			. '</p>';
+
+		return $this->admin_postbox ('wp-quadratum-support', __('Help &amp; Support'), $content);
+	}
+
+	/**
+	 * Emits the plugin's colophon side-box for the plugin's admin settings/options page.
+	 */
+
+	function admin_show_colophon() {
+		$content = '<p><em>"When it comes to software, I much prefer free software, because I have very seldom seen a program that has worked well enough for my needs and having sources available can be a life-saver"</em>&nbsp;&hellip;&nbsp;Linus Torvalds</p>';
+
+		$content .= '<p>'
+			. __('For the inner nerd in you, the latest version of WP Quadratum was written using <a href="http://macromates.com/">TextMate</a> on a MacBook Pro running OS X 10.7.3 Lion and tested on the same machine running <a href="http://mamp.info/en/index.html">MAMP</a> (Mac/Apache/MySQL/PHP) before being let loose on the author\'s <a href="http://www.vicchi.org/">blog</a>.')
+			. '<p>';
+
+		$content .= '<p>'
+			. __('The official home for WP Quadratum is on <a href="http://www.vicchi.org/codeage/wp-quadratum/">Gary\'s Codeage</a>; it\'s also available from the official <a href="http://wordpress.org/extend/plugins/wp-quadratum/">WordPress plugins repository</a>. If you\'re interested in what lies under the hood, the code is also on <a href="https://github.com/vicchi/wp-quadratum">GitHub</a> to download, fork and otherwise hack around.')
+			. '<p>';
+
+		$content .= '<p>'
+			. __('WP Quadratum is named after both the Latin words <em>quattor</em>, meaning four and <em>quadratum</em>, meaning square.')
+			. '</p>';
+
+		return $this->admin_postbox ('wp-quadratum-colophon', __('Colophon'), $content);
+	}
+
 }	// end-class WPQuadratum
 
 $__wp_quadratum_instance = new WPQuadratum;
