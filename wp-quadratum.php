@@ -47,7 +47,8 @@ class WPQuadratum extends WP_PluginBase {
 	static $instance;
 	
 	const OPTIONS = 'wp_quadratum_settings';
-	const WPQUADRATUM_VERSION = '10';
+	const VERSION = '10';
+	const DISPLAY_VERSION = 'v1.0';
 	
 	function __construct () {
 		self::$instance = $this;
@@ -95,7 +96,7 @@ class WPQuadratum extends WP_PluginBase {
 			$settings = apply_filters ('wp_quadratum_default_settings',
 				array (
 					"installed" => "on",
-					"version" => WPQUADRATUM_VERSION,
+					"version" => self::VERSION,
 					"client_id" => "",
 					"client_secret" => "",
 					"oauth_token" => ""
@@ -202,7 +203,7 @@ class WPQuadratum extends WP_PluginBase {
 		$options = $this->get_option ();
 		if (is_array ($options) &&
 				!empty ($options['version']) &&
-				$options['version'] == WPQUADTRATUM_VERSION) {
+				$options['version'] == self::VERSION) {
 			return;
 		}
 
@@ -221,7 +222,7 @@ class WPQuadratum extends WP_PluginBase {
 			switch ($current_plugin_version) {
 				case '00':
 				case '10':
-					$options['version'] = WPQUADRATUM_VERSION;
+					$options['version'] = self::VERSION;
 					$upgrade_settings = true;
 
 				default:
@@ -364,7 +365,9 @@ class WPQuadratum extends WP_PluginBase {
 		$wrapped_content[] = $this->admin_postbox ('wp-quadratum-nokia-settings',
 			$nokia_title, implode ('', $nokia_settings));
 			
-		$this->admin_wrap (__('WP Quadratum Settings And Options'), implode ('', $wrapped_content));
+		$this->admin_wrap (
+			sprintf (__('WP Quadratum %s - Settings And Options'), self::DISPLAY_VERSION),
+				implode ('', $wrapped_content));
 	}
 
 	function admin_option ($field) {
