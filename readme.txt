@@ -20,6 +20,8 @@ Setting and options include:
 1. Choose the zoom level of the map display.
 1. Choose whether to show private checkins on the map.
 
+The current version of this plugin allows you to associate a single Foursquare account with your WordPress site; associating multiple Foursquare accounts, one per user account is not currently supported.
+
 == Installation ==
 
 1. You can install WP Quadratum automatically from the WordPress admin panel. From the Dashboard, navigate to the *Plugins / Add New* page and search for *"WP Quadratum"* and click on the *"Install Now"* link.
@@ -44,6 +46,10 @@ In short, very easily. But before you read any further, take a look at [Asking F
 = Is there a web site for this plugin? =
 
 Absolutely. Go to the [WP Quadratum home page](http://www.vicchi.org/codeage/wp-quadratum/) for the latest information. There's also the official [WordPress plugin repository page](http://wordpress.org/extend/plugins/wp-quadratum/) and the [source for the plugin is on GitHub](http://vicchi.github.com/wp-quadratum/) as well.
+
+= I have multiple authors on my site; can I have a widget for each author's Foursquare account?
+
+In the current version, no. In the current version, you can link a single Foursquare account with your WordPress site (multi-site or network sites may work, assuming each site is for a single user but I haven't tested this). The plugin is currently designed to support a WordPress site which is used for a personal blog (in other words, exactly the way my site is set up). Future versions of the plugin *may* support this if people ask for this feature (assuming anyone apart from myself actually *uses* it!).
 
 = Nokia Maps? Really? =
 
