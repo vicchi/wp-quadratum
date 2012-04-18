@@ -173,10 +173,6 @@ class WPQuadratumWidget extends WP_Widget {
 				. '" class="wp-quadratum-container" style="width:'
 				. $instance['width']
 				. 'px;">';
-
-			$content[] = '<a href="'
-				. $venue_url
-				. '" target="_blank">';
 				
 			$content[] = '<div id="'
 				. $map_id
@@ -238,8 +234,6 @@ class WPQuadratumWidget extends WP_Widget {
 				});
 			map.objects.add (marker);
 			</script>';
-
-			$content[] = '</a>';
 
 			$content[] = '<div class="wp-quadratum-venue-name"><h5>'
 				. 'Last seen at '
