@@ -3,7 +3,7 @@
 Plugin Name: WP Quadratum
 Plugin URI: http://www.vicchi.org/codeage/wp-quadratum/
 Description: A WordPress plugin to display your last Foursquare checkin as a widget, fully authenticated via OAuth 2.0.
-Version: 1.0.1
+Version: 1.0.2
 Author: Gary Gale
 Author URI: http://www.garygale.com/
 License: GPL2
@@ -47,8 +47,8 @@ class WPQuadratum extends WP_PluginBase {
 	static $instance;
 	
 	const OPTIONS = 'wp_quadratum_settings';
-	const VERSION = '10';
-	const DISPLAY_VERSION = 'v1.0';
+	const VERSION = '102';
+	const DISPLAY_VERSION = 'v1.0.2';
 	
 	function __construct () {
 		self::$instance = $this;
@@ -99,7 +99,9 @@ class WPQuadratum extends WP_PluginBase {
 					"version" => self::VERSION,
 					"client_id" => "",
 					"client_secret" => "",
-					"oauth_token" => ""
+					"oauth_token" => "",
+					"app_id" => "",
+					"app_token" => ""
 					)
 				);
 
@@ -222,11 +224,13 @@ class WPQuadratum extends WP_PluginBase {
 			switch ($current_plugin_version) {
 				case '00':
 				case '10':
+				case '101':
+				case '102':
 					$options['version'] = self::VERSION;
 					$upgrade_settings = true;
 
 				default:
-				break;
+					break;
 			}	// end-switch
 
 			if ($upgrade_settings) {
@@ -319,10 +323,8 @@ class WPQuadratum extends WP_PluginBase {
 					. '</div>';
 				$nokia_settings[] = '<p><strong>' . __('App ID') . '</strong></p>
 				<input type="text" size="30" disabled value="' . $helper->get_id () . '"><br />';
-				$nokia_settings[] = '<p><strong>' . __('App Token') . '</strong></p>
+				$nokia_settings[] = '<p><strong>' . __('Token / App Code') . '</strong></p>
 					<input type="text" size="30" disabled value="' . $helper->get_token () . '"><br />';
-				$nokia_settings[] = '<p><strong>' . __('App Secret') . '</strong></p>
-					<input type="text" size="30" disabled value="' . $helper->get_secret () . '"><br />';
 			}
 			
 			else {
@@ -337,18 +339,13 @@ class WPQuadratum extends WP_PluginBase {
 			$nokia_settings[] = '<p>'
 				. sprintf (__('You can use the <a href="%1$s">WP Nokia Auth plugin</a> to manage your Nokia Location Platform API credentials. Or you can obtain Nokia Location API credentials from the <a href="%2$s">Nokia API Registration</a> site.'), 'http://wordpress.org/extend/plugins/wp-nokia-auth/', 'http://api.developer.nokia.com/')
 				. '</p>';
-			$nokia_settings[] = '<p><strong>' . __('Application ID') . '</strong><br />
+			$nokia_settings[] = '<p><strong>' . __('App ID') . '</strong><br />
 				<input type="text" name="wp_quadratum_app_id" id="wp_quadratum_app_id" value="' . $options['app_id'] . '" size="35" /><br />
 				<small>' . __('Enter your registered Nokia Location API App ID') . '</small></p>';
 
-			$nokia_settings[] = '<p><strong>' . __('Application Token') . '</strong><br />
+			$nokia_settings[] = '<p><strong>' . __('Token / App Code') . '</strong><br />
 				<input type="text" name="wp_quadratum_app_token" id="wp_quadratum_app_token" value="' . $options['app_token'] . '" size="35" /><br />
-				<small>' . __('Enter your registered Nokia Location API App Token') . '</small></p>';
-
-			$nokia_settings[] = '<p><strong>' . __('Application Secret') . '</strong><br />
-				<input type="text" name="wp_quadratum_app_secret" id="wp_quadratum_app_secret" value="' . $options['app_secret'] . '" size="35" /><br />
-				<small>' . __('Enter your registered Nokia Location API App Secret') . '</small></p>';
-
+				<small>' . __('Enter your registered Nokia Location API Token / App Code') . '</small></p>';
 		}
 
 		if (function_exists ('wp_nonce_field')) {
@@ -385,7 +382,6 @@ class WPQuadratum extends WP_PluginBase {
 
 				$options['app_id'] = html_entity_decode ($this->admin_option ('wp_quadratum_app_id'));
 				$options['app_token'] = html_entity_decode ($this->admin_option ('wp_quadratum_app_token'));
-				$options['app_secret'] = html_entity_decode ($this->admin_option ('wp_quadratum_app_secret'));
 
 				echo "<div id=\"updatemessage\" class=\"updated fade\"><p>";
 				_e('WP Quadratum Settings And Options Updated.');
