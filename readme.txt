@@ -4,7 +4,7 @@ Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.3
 Tested up to: 3.3.1
-Stable tag: 1.0
+Stable tag: 1.0.1
 
 A WordPress plugin to display your last Foursquare checkin as a map widget, fully authenticated via OAuth 2.0.
 
@@ -47,7 +47,7 @@ In short, very easily. But before you read any further, take a look at [Asking F
 
 Absolutely. Go to the [WP Quadratum home page](http://www.vicchi.org/codeage/wp-quadratum/) for the latest information. There's also the official [WordPress plugin repository page](http://wordpress.org/extend/plugins/wp-quadratum/) and the [source for the plugin is on GitHub](http://vicchi.github.com/wp-quadratum/) as well.
 
-= I have multiple authors on my site; can I have a widget for each author's Foursquare account?
+= I have multiple authors on my site; can I have a widget for each author's Foursquare account? =
 
 In the current version, no. In the current version, you can link a single Foursquare account with your WordPress site (multi-site or network sites may work, assuming each site is for a single user but I haven't tested this). The plugin is currently designed to support a WordPress site which is used for a personal blog (in other words, exactly the way my site is set up). Future versions of the plugin *may* support this if people ask for this feature (assuming anyone apart from myself actually *uses* it!).
 
