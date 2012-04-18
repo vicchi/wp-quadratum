@@ -4,7 +4,7 @@ Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.3
 Tested up to: 3.3.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 A WordPress plugin to display your last Foursquare checkin as a map widget, fully authenticated via OAuth 2.0.
 
@@ -82,12 +82,26 @@ Totally; this plugin is licensed under the GNU General Public License v2 (GPLV2)
 
 == Changelog ==
 
-The current version is 1.0 (2012.04.12)
+The current version is 1.0.2 (2012.04.12)
+
+= 1.0.2 =
+Summary: Minor fixes to widget HTML structure
+Fixed: Non W3C/HTML4 compliant widget code which caused the map not to be displayed when viewed with Internet Explorer
+
+= 1.0.1 =
+Summary: Minor fixes to PHP base class.
+Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Quadratum extends.
 
 = 1.0 =
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+
+= 1.0.2 =
+This is the 3rd version of WP Quadratum; makes widget code W3C/HTML4 compliant, which was breaking widget display on Internet Explorer.
+
+= 1.0.1 =
+This is the 2nd version of WP Quadratum; fixing an issue with the PHP base class that the code extends.
 
 = 1.0 =
 * This is the first version of WP Quadratum
