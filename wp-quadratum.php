@@ -3,7 +3,7 @@
 Plugin Name: WP Quadratum
 Plugin URI: http://www.vicchi.org/codeage/wp-quadratum/
 Description: A WordPress plugin to display your last Foursquare checkin as a widget, fully authenticated via OAuth 2.0.
-Version: 1.0.2
+Version: 1.1
 Author: Gary Gale
 Author URI: http://www.garygale.com/
 License: GPL2
@@ -69,6 +69,9 @@ class WPQuadratum extends WP_PluginBase {
 		
 		$this->hook ('init');
 		$this->hook ('widgets_init');
+		$this->hook ('wp_head', 'head', 1);
+
+		add_shortcode ('wp_quadratum', array ($this, 'shortcode'));
 		
 		if (is_admin ()) {
 			$this->hook ('admin_init');
@@ -134,6 +137,146 @@ class WPQuadratum extends WP_PluginBase {
 		update_option (self::OPTIONS, $options);
 	}
 
+	function head () {
+		echo '<meta http-equiv="X-UA-Compatible" content="IE=7; IE=EmulateIE9" />';
+	}
+	
+	function shortcode ($atts, $content=null) {
+		// TODO: handle self-closing and enclosing shortcode forms properly
+		// TODO: this function is fugly; need to break out the checkin acquisition
+		// and map generation code into a function/functions that can be called by
+		// both the shortcode, the widget and the the_content filter (when I write it)
+		// TODO: check and handle error responses from the 4sq API
+		// TODO: handle 4sq API response caching
+		
+		static $instance = 0;
+		
+		$container_id = 'wp-quadratum-shortcode-container-' . $instance;
+		$map_id = 'wp-quadratum-shortcode-map-' . $instance;
+		$content = array ();
+		
+		extract (shortcode_atts (array (
+			'width' => 300,
+			'height' => 300,
+			'zoom' => 16,
+			'private' => false
+		), $atts));
+
+		$client_id = $this->get_option ('client_id');
+		$client_secret = $this->get_option ('client_secret');
+		$oauth_token = $this->get_option ('oauth_token');
+		
+		$redirect_url = plugins_url ()
+			. '/'
+			. dirname (plugin_basename (__FILE__))
+			. '/wp-quadratum-callback.php';
+
+		$fh = new FoursquareHelper ($client_id, $client_secret, $redirect_url);
+		$fh->set_access_token ($oauth_token);
+		$params = array (
+			'limit' => 1
+			);
+		$endpoint = "users/self/checkins";
+		$response = $fh->get_private ($endpoint, $params);
+		$json = json_decode ($response);
+		$checkins = $json->response->checkins->items;
+
+		foreach ($checkins as $checkin) {
+			$venue = $checkin->venue;
+			$location = $venue->location;
+			$categories = $venue->categories;
+
+			$venue_url = 'https://foursquare.com/v/' . $venue->id;
+		
+			foreach ($categories as $category) {
+				$icon_url = $category->icon;
+				break;
+			}
+
+			if (is_object ($icon_url)) {
+				$icon_url = $icon_url->prefix . '32' . $icon_url->name;
+			}
+		
+			$content[] = '<div id="' . $container_id
+				. '" class="wp-quadratum-shortcode-container" style="height:'
+				. $height
+				. 'px;">';
+			
+			$content[] = '<div id="'
+				. $map_id
+				. '" class="wp-quadratum-map" style="width:'
+				. $width
+				. 'px; height:'
+				. $height
+				. 'px;">';
+			$content[] = '</div>';
+		
+			$app_id = NULL;
+			$app_token = NULL;
+		
+			if (WPQuadratum::is_wpna_installed () && WPQuadratum::is_wpna_active ()) {
+				$helper = new WPNokiaAuthHelper ();
+			
+				$tmp = $helper->get_id ();
+				if (!empty ($tmp)) {
+					$app_id = $tmp;
+				}
+			
+				$tmp = $helper->get_token ();
+				if (!empty ($tmp)) {
+					$app_token = $tmp;
+				}
+			}
+		
+			else {
+				$app_id = $this->get_option ('app_id');
+				$app_token = $this->get_option ('app_token');
+			}
+		
+			if (!empty ($app_id) && !empty ($app_id)) {
+				$content[] = '<script type="text/javascript">
+					nokia.maps.util.ApplicationContext.set (
+					{
+						"appId": "' . $app_id . '",
+							"authenticationToken": "' . $app_token . '"
+						}
+					);';
+			}
+
+			$content[] = 'var coords = new nokia.maps.geo.Coordinate (' . $location->lat . ',' . $location->lng . ');
+			var map = new nokia.maps.map.Display (
+			document.getElementById ("' . $map_id . '"),
+			{
+				\'zoomLevel\': ' . $zoom . ',
+				\'center\': coords
+			}
+			);
+			var marker = new nokia.maps.map.Marker (
+			coords,
+			{
+				\'icon\': "' . $icon_url . '"
+			});
+			map.objects.add (marker);
+			</script>';
+
+			$content[] = '<div class="wp-quadratum-venue-name"><h5>'
+				. 'Last seen at '
+				. '<a href="'
+				. $venue_url
+				. '" target="_blank">'
+				. $checkin->venue->name
+				. '</a>'
+				. ' on '
+				. date ("d M Y G:i T", $checkin->createdAt)
+				. '</h5></div>';
+
+			$content[] = '</div>';
+			break;	// Not really needed as we only return a single checkin item
+		}
+
+		return implode ('', $content);
+	}
+	
 	function admin_init () {
 		$this->admin_upgrade ();
 		$settings = $this->get_option ();

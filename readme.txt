@@ -4,13 +4,13 @@ Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.3
 Tested up to: 3.3.1
-Stable tag: 1.0.2
+Stable tag: 1.1
 
-A WordPress plugin to display your last Foursquare checkin as a map widget, fully authenticated via OAuth 2.0.
+A WordPress plugin to display your last Foursquare checkin as a map widget in the sidebar or embedded in a post or page, fully authenticated via OAuth 2.0.
 
 == Description ==
 
-This plugin allows you to display your last Foursquare checkin as a map widget on the sidebar of your WordPress powered site.
+This plugin allows you to display your last Foursquare checkin as a map widget on the sidebar or embedded in a post or page of your WordPress powered site.
 
 Setting and options include:
 
@@ -82,7 +82,12 @@ Totally; this plugin is licensed under the GNU General Public License v2 (GPLV2)
 
 == Changelog ==
 
-The current version is 1.0.2 (2012.04.12)
+The current version is 1.1 (2012.06.07)
+
+= 1.1 =
+* Released: 2012.06.07
+* Added: Support for Internet Explorer compatibility for Nokia Maps.
+* Added: `[wp_quadratum]` shortcode to allow a checkin map to be embedded in posts and pages.
 
 = 1.0.2 =
 Summary: Minor fixes to widget HTML structure
@@ -96,6 +101,8 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+= 1.1 =
+Adds support for Internet Explorer map rendering issues and a new shortcode. This is the 4th. version of WP Quadratum.
 
 = 1.0.2 =
 This is the 3rd version of WP Quadratum; makes widget code W3C/HTML4 compliant, which was breaking widget display on Internet Explorer.
@@ -105,3 +112,25 @@ This is the 2nd version of WP Quadratum; fixing an issue with the PHP base class
 
 = 1.0 =
 * This is the first version of WP Quadratum
+
+== Shortcode Support And Usage ==
+
+WP Quadratum supports a single shortcode, `[wp_biographia]`. Adding this shortcode to the content of a post or page or into a theme template as content, expands the shortcode and replaces it with a checkin map.
+
+The shortcode also supports multiple *attributes* which allow you to customise the way in which the shortcode is expanded into the checkin map:
+
+* the `width` attribute
+* the `height` attribute
+* the `zoom` attribute
+
+= The "width" Attribute =
+
+The `width` attribute, in conjunction with the `height` attribute specifies the width, in pixels, of the map to be inserted into a post or page. If omitted, the map width defaults to a value of `300px`.
+
+= The "height" Attribute =
+
+The `height` attribute, in conjunction with the `width` attribute specifies the height, in pixels, of the map to be inserted into a post or page. If omitted, the map height defaults to a value of `300px`.
+
+= The "zoom" Attribute =
+
+The `zoom` attribute specifies the zoom level to be used when displaying the checkin map. If omitted, the zoom level defaults to a value of `16` which is roughly analogous to a neighbourhood zoom.
