@@ -70,6 +70,7 @@ class WPQuadratum extends WP_PluginBase {
 		$this->hook ('init');
 		$this->hook ('widgets_init');
 		$this->hook ('wp_head', 'head', 1);
+		$this->hook ('wp_enqueue_scripts', 'enqueue_scripts');
 
 		add_shortcode ('wp_quadratum', array ($this, 'shortcode'));
 		
@@ -139,6 +140,11 @@ class WPQuadratum extends WP_PluginBase {
 
 	function head () {
 		echo '<meta http-equiv="X-UA-Compatible" content="IE=7; IE=EmulateIE9" />';
+	}
+	
+	function enqueue_scripts () {
+		wp_register_script ('nokiamaps', 'http://api.maps.nokia.com/2.1.1/jsl.js');
+		wp_enqueue_script ('nokiamaps');
 	}
 	
 	function shortcode ($atts, $content=null) {

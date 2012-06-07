@@ -14,7 +14,6 @@ class WPQuadratumWidget extends WP_Widget {
 	}
 	
 	function widget_external() {
-		wp_register_script ('nokiamaps', 'http://api.maps.nokia.com/2.1.1/jsl.js');
 		wp_enqueue_script ('nokiamaps');
 	}
 	
