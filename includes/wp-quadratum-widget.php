@@ -2,12 +2,12 @@
 
 require_once (WPQUADRATUM_PATH . '/foursquare-helper/foursquare-helper.php');
 
-class WPQuadratumWidget extends WP_Widget {
+class WP_QuadratumWidget extends WP_Widget {
 	function __construct() {
 		$widget_ops = array (
 			'description' => __('Displays your last Foursquare checkin')
 			);
-		parent::WP_Widget ('WPQuadratumWidget', __('WP Quadratum'), $widget_ops);
+		parent::WP_Widget ('WP_QuadratumWidget', __('WP Quadratum'), $widget_ops);
 		if (is_active_widget (false, false, $this->id_base)) {
 			add_action ('template_redirect', array ($this, 'widget_external'));
 		}
@@ -40,7 +40,7 @@ class WPQuadratumWidget extends WP_Widget {
 				__('Widget Title'),
 				$this->get_field_id ('title'),
 				$this->get_field_name ('title'),
-				attribute_escape ($instance['title'])
+				esc_attr ($instance['title'])
 				)
 			. '</p>';
 
@@ -50,7 +50,7 @@ class WPQuadratumWidget extends WP_Widget {
 				__('Widget Width'),
 				$this->get_field_id ('width'),
 				$this->get_field_name ('width'),
-				attribute_escape ($instance['width'])
+				esc_attr ($instance['width'])
 				)
 			. '</p>';
 
@@ -60,7 +60,7 @@ class WPQuadratumWidget extends WP_Widget {
 				__('Map Height'),
 				$this->get_field_id ('height'),
 				$this->get_field_name ('height'),
-				attribute_escape ($instance['height'])
+				esc_attr ($instance['height'])
 				)
 			. '</p>';
 
@@ -70,7 +70,7 @@ class WPQuadratumWidget extends WP_Widget {
 				__('Map Zoom Level'),
 				$this->get_field_id ('zoom'),
 				$this->get_field_name ('zoom'),
-				attribute_escape ($instance['zoom'])
+				esc_attr ($instance['zoom'])
 				)
 			. '</p>';
 
@@ -90,7 +90,7 @@ class WPQuadratumWidget extends WP_Widget {
 				__('Widget Id'),
 				$this->get_field_id ('id'),
 				$this->get_field_name ('id'),
-				attribute_escape ($instance['id'])
+				esc_attr ($instance['id'])
 				)
 			. '</p>';
 			
@@ -104,7 +104,9 @@ class WPQuadratumWidget extends WP_Widget {
 		$instance['width'] = (int)strip_tags ($new_instance['width']);
 		$instance['height'] = (int)strip_tags ($new_instance['height']);
 		$instance['zoom'] = (int)strip_tags ($new_instance['zoom']);
-		$instance['private'] = (int)$new_instance['private'];
+		if (isset ($instance['private'])) {
+			$instance['private'] = (int)$new_instance['private'];
+		}
 		$instance['id'] = (int)strip_tags($new_instance['id']);
 		
 		return $instance;
@@ -130,62 +132,16 @@ class WPQuadratumWidget extends WP_Widget {
 
 		$options = get_option ('wp_quadratum_settings');
 
-		$client_id = $options['client_id'];
-		$client_secret = $options['client_secret'];
-		$redirect_url = plugins_url ()
-			. '/'
-			. dirname (plugin_basename (__FILE__))
-			. '/wp-quadratum-callback.php';
-
-		$fh = new FoursquareHelper ($client_id, $client_secret, $redirect_url);
-		$fh->set_access_token ($options['oauth_token']);
-		$params = array (
-			'limit' => 1
-			);
-		$endpoint = "users/self/checkins";
-		$response = $fh->get_private ($endpoint, $params);
-		$json = json_decode ($response);
+		$json = WP_Quadratum::get_foursquare_checkins ();
 		$checkins = $json->response->checkins->items;
 
 		// TODO: Handle response caching
 
 		foreach ($checkins as $checkin) {
-			$venue = $checkin->venue;
-			$location = $venue->location;
-			$categories = $venue->categories;
-			$map_id = 'wp-quadratum-map-' . $instance['id'];
-
-			$venue_url = 'https://foursquare.com/v/'
-				. $venue->id;
-			
-			foreach ($categories as $category) {
-				$icon_url = $category->icon;
-				break;
-			}
-
-			if (is_object ($icon_url)) {
-				$icon_url = $icon_url->prefix . '32' . $icon_url->name;
-			}
-			
-			$content[] = '<div id="wp-quadratum-container-'
-				. $instance['id']
-				. '" class="wp-quadratum-container" style="width:'
-				. $instance['width']
-				. 'px;">';
-				
-			$content[] = '<div id="'
-				. $map_id
-				. '" class="wp-quadratum-map" style="width:'
-				. $instance['width']
-				. 'px; height:'
-				. $instance['height']
-				. 'px;">';
-			$content[] = '</div>';
-			
 			$app_id = NULL;
 			$app_token = NULL;
 			
-			if (WPQuadratum::is_wpna_installed () && WPQuadratum::is_wpna_active ()) {
+			if (WP_Quadratum::is_wpna_installed () && WP_Quadratum::is_wpna_active ()) {
 				$helper = new WPNokiaAuthHelper ();
 				
 				$tmp = $helper->get_id ();
@@ -200,56 +156,30 @@ class WPQuadratumWidget extends WP_Widget {
 			}
 			
 			else {
-				if (!empty ($options['app_id'])) {
-					$app_id = $options['app_id'];
-				}
-				if (!empty ($options['app_token'])) {
-					$app_token = $options['app_token'];
-				}
+				$app_id = WP_Quadratum::get_option ('app_id');
+				$app_token = WP_Quadratum::get_option ('app_token');
 			}
 			
-			if (!empty ($app_id) && !empty ($app_id)) {
-				$content[] = '<script type="text/javascript">
-				nokia.maps.util.ApplicationContext.set (
-					{
-						"appId": "' . $app_id . '",
-						"authenticationToken": "' . $app_token . '"
-					}
-				);';
-			}
-
-			$content[] = 'var coords = new nokia.maps.geo.Coordinate (' . $location->lat . ',' . $location->lng . ');
-			var map = new nokia.maps.map.Display (
-				document.getElementById ("' . $map_id . '"),
-				{
-					\'zoomLevel\': ' . $instance['zoom'] . ',
-					\'center\': coords
-				}
-				);
-			var marker = new nokia.maps.map.Marker (
-				coords,
-				{
-					\'icon\': "' . $icon_url . '"
-				});
-			map.objects.add (marker);
-			</script>';
-
-			$content[] = '<div class="wp-quadratum-venue-name"><h5>'
-				. 'Last seen at '
-				. '<a href="'
-				. $venue_url
-				. '" target="_blank">'
-				. $checkin->venue->name
-				. '</a>'
-				. ' on '
-				. date ("d M Y G:i T", $checkin->createdAt)
-				. '</h5></div>';
-
-			$content[] = '</div>';
+			$args = array ();
+			$args['width'] = $instance['width'];
+			$args['height'] = $instance['height'];
+			$args['zoom'] = $instance['zoom'];
+			$args['private'] = $instance['private'];
+			$args['app-id'] = $app_id;
+			$args['app-token'] = $app_token;
+			$args['container-class'] = 'wp-quadratum-widget-container';
+			$args['container-id'] = 'wp-quadratum-widget-container-' . $instance['id'];
+			$args['map-class'] = 'wp-quadratum-widget-map';
+			$args['map-id'] = 'wp-quadratum-widget-map-' . $instance['id'];
+			$args['venue-class'] = 'wp-quadratum-widget-venue';
+			$args['checkin'] = $checkin;
+			$content = WP_QuadratumFrontEnd::render_checkin_map ($args);
+			
 			break;	// Not really needed as we only return a single checkin item
 		}
 
-		return implode ('', $content);
+		return implode (PHP_EOL, $content);
 	}
-}
+	
+}	// end class WP_QuadratumWidget
 ?>
