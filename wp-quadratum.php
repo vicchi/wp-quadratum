@@ -32,6 +32,7 @@ if (!defined ('WPMU_PLUGIN_DIR'))
 	define ('WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins');
 
 require_once (WPQUADRATUM_PATH . '/wp-plugin-base/wp-plugin-base.php');
+require_once (WPQUADRATUM_PATH . '/wp-mxn-helper/wp-mxn-helper.php');
 require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
 
 define ('WPNAUTH_PLUGIN_HELPER', WP_PLUGIN_DIR . '/wp-nokia-auth/wp-nokia-auth-helper.php');
@@ -47,8 +48,8 @@ class WP_Quadratum extends WP_PluginBase {
 	static $instance;
 	
 	const OPTIONS = 'wp_quadratum_settings';
-	const VERSION = '102';
-	const DISPLAY_VERSION = 'v1.0.2';
+	const VERSION = '110';
+	const DISPLAY_VERSION = 'v1.1.0';
 	
 	function __construct () {
 		self::$instance = $this;
@@ -76,11 +77,12 @@ class WP_Quadratum extends WP_PluginBase {
 	}
 	
 	function plugins_loaded () {
+		error_log ('plugins_loaded');
 		register_activation_hook (__FILE__, array ($this, 'add_settings'));
 		
 		$this->hook ('init');
 		$this->hook ('widgets_init');
-		
+		$this->hook ('wp_mxn_helper_providers', 'trim_mapstraction_providers');
 		
 		if (is_admin ()) {
 			// For admin_init, admin_menu, admin_print_styles, admin_print_scripts and
@@ -97,6 +99,19 @@ class WP_Quadratum extends WP_PluginBase {
 		}
 	}
 	
+	function trim_mapstraction_providers ($providers) {
+		//$plugin_providers = array ('nokia', 'googlev3', 'leaflet', 'openmq', 'cloudmade', 'openlayers');
+		$plugin_providers = array ('nokia', 'googlev3', 'cloudmade', 'openlayers');
+		$trimmed_providers = array ();
+		foreach ($providers as $pname => $pchar) {
+			if (in_array ($pname, $plugin_providers)) {
+				$trimmed_providers[$pname] = $pchar;
+			}
+		}
+		
+		return $trimmed_providers;
+	}
+	
 	function init () {
 		$lang_dir = basename (dirname (__FILE__)) . DIRECTORY_SEPARATOR . 'lang';
 		load_plugin_textdomain ('wp-quadratum', false, $lang_dir);
@@ -107,6 +122,7 @@ class WP_Quadratum extends WP_PluginBase {
 	}
 	
 	static function add_settings () {
+		error_log ('add_settings');
 		$settings = WP_Quadratum::get_option ();
 
 		if (!is_array ($settings)) {
@@ -117,8 +133,12 @@ class WP_Quadratum extends WP_PluginBase {
 					"client_id" => "",
 					"client_secret" => "",
 					"oauth_token" => "",
-					"app_id" => "",
-					"app_token" => ""
+					"provider" => "nokia",
+					"nokia_app_id" => "",
+					"nokia_app_token" => "",
+					"google_key" => "",
+					"google_sensor" => "false",
+					"cloudmade_key" => "",
 					)
 				);
 

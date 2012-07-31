@@ -164,7 +164,9 @@ class WP_QuadratumWidget extends WP_Widget {
 			$args['width'] = $instance['width'];
 			$args['height'] = $instance['height'];
 			$args['zoom'] = $instance['zoom'];
-			$args['private'] = $instance['private'];
+			if (isset ($instance['private'])) {
+				$args['private'] = $instance['private'];
+			}
 			$args['app-id'] = $app_id;
 			$args['app-token'] = $app_token;
 			$args['container-class'] = 'wp-quadratum-widget-container';

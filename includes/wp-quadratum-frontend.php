@@ -1,24 +1,109 @@
 <?php
 
 class WP_QuadratumFrontEnd extends WP_PluginBase {
+	private	$mxn;
 	
 	function __construct () {
-		$this->hook ('wp_head', 'head', 1);
-		$this->hook ('wp_enqueue_scripts', 'enqueue_scripts');
+		$this->mxn = new WP_MXNHelper;
+		$this->mxn->register_callback ('cloudmade', array ($this, 'cloudmade_mxn_callback'));
+		$this->mxn->register_callback ('nokia', array ($this, 'nokia_mxn_callback'));
+		$this->mxn->register_callback ('googlev3', array ($this, 'googlev3_mxn_callback'));
+
+		$provider = WP_Quadratum::get_option ('provider');
+		$this->mxn->set_providers (array ($provider));
+		
+		//$this->hook ('wp_head', 'head', 1);
+		//$this->hook ('wp_head', 'head_suffix', 999);
+		//$this->hook ('wp_enqueue_scripts', 'enqueue_scripts');
 		
 		add_shortcode ('wp_quadratum', array ($this, 'shortcode'));
 	}
 	
-	function head () {
-		echo '<meta http-equiv="X-UA-Compatible" content="IE=7; IE=EmulateIE9" />';
+	/*function head () {
+		$provider = WP_Quadratum::get_option ('provider');
+		$header = $this->mxn->get_provider_header ($provider);
+		if (isset ($header)) {
+			echo $header;
+		}
+	}*/
+	
+	/*function head_suffix () {
+		$provider = WP_Quadratum::get_option ('provider');
+		//echo '<script type="text/javascript" src="https://raw.github.com/vicchi/mxn/master/source/mxn.js?(' . $provider . ')"></script>';
+		$header = $this->mxn->get_provider_init ($provider);
+		if (isset ($header)) {
+			echo $header;
+		}
+	}*/
+	
+	/*function enqueue_scripts () {
+		$provider = WP_Quadratum::get_option ('provider');
+		$core = $this->mxn->get_mxn_script ($provider);
+		if (isset ($core)) {
+			$style = $this->mxn->get_provider_style ($provider);
+			if (isset ($style)) {
+				wp_register_style ($style['handle'], $style['style']);
+				
+				wp_enqueue_style ($style['handle']);
+			}
+
+			$script = $this->mxn->get_provider_script ($provider);
+			if (isset ($script)) {
+				wp_register_script ($script['handle'], $script['script']);
+				wp_register_script ($core['handle'], $core['script']);
+
+				wp_enqueue_script ($script['handle']);
+				wp_enqueue_script ($core['handle']);
+			}
+		}
+	}*/
+
+	function cloudmade_mxn_callback () {
+		$key = WP_Quadratum::get_option ('cloudmade_key');
+		
+		if (isset ($key)) {
+			return (array ('key' => $key));
+		}
 	}
 	
-	function enqueue_scripts () {
-		wp_register_script ('nokiamaps', 'http://api.maps.nokia.com/2.1.1/jsl.js');
-		wp_enqueue_script ('nokiamaps');
+	function nokia_mxn_callback () {
+		$app_id = null;
+		$auth_token = null;
+	
+		if (WP_Quadratum::is_wpna_installed () && WP_Quadratum::is_wpna_active ()) {
+			$helper = new WPNokiaAuthHelper ();
+		
+			$tmp = $helper->get_id ();
+			if (!empty ($tmp)) {
+				$app_id = $tmp;
+			}
+		
+			$tmp = $helper->get_token ();
+			if (!empty ($tmp)) {
+				$auth_token = $tmp;
+			}
+		}
+	
+		else {
+			$app_id = WP_Quadratum::get_option ('app_id');
+			$auth_token = WP_Quadratum::get_option ('app_token');
+		}
+		
+		if (isset ($app_id) && isset ($auth_token)) {
+			return array ('app-id' => $app_id, 'auth-token' => $auth_token);
+		}
+	}
+	
+	function googlev3_mxn_callback () {
+		$key = WP_Quadratum::get_option ('google_key');
+		$sensor = WP_Quadratum::get_option ('google_sensor');
+		
+		if (isset ($key) && isset ($sensor)) {
+			return (array ('key' => $key, 'sensor' => $sensor));
+		}
 	}
 
-	function render_checkin_map ($args) {
+	static function render_checkin_map ($args) {
 		// $args = array (
 		//		'width' =>
 		//		'height' =>
@@ -34,11 +119,12 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 		//		'checkin' =>
 		//	)
 
+		$provider = WP_Quadratum::get_option ('provider');
+
 		$checkin = $args['checkin'];
 		$venue = $checkin->venue;
 		$location = $venue->location;
 		$categories = $venue->categories;
-
 		$venue_url = 'https://foursquare.com/v/' . $venue->id;
 		foreach ($categories as $category) {
 			$icon_url = $category->icon;
@@ -53,18 +139,28 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 
 		$js = array ();
 		$js[] = '<script type="text/javascript">';
-		if ((isset ($args['app-id']) && !empty ($args['app-id'])) && (isset ($args['app-token']) && !empty ($args['app-token']))) {
+		/*if ((isset ($args['app-id']) && !empty ($args['app-id'])) && (isset ($args['app-token']) && !empty ($args['app-token']))) {
 			$js[] = 'nokia.maps.util.ApplicationContext.set ({';
 			$js[] = $tab . '"appId": "' . $args['app-id'] . '",';
 			$js[] = $tab . '"authenticationToken": "' . $args['app-token'] . '"';
 			$js[] = '});';
-		}
-		$js[] = 'var coords = new nokia.maps.geo.Coordinate (' . $location->lat . ',' . $location->lng . ');';
-		$js[] = "var args = {'zoomLevel': " . $args['zoom'] . ", 'center': coords};";
-		$js[] = "var marker = new nokia.maps.map.Marker (coords, {'icon': '" . $icon_url . "'});";
+		}*/
+
 		$js[] = "var id = document.getElementById ('" . $args['map-id'] . "');";
-		$js[] = 'var map = new nokia.maps.map.Display (id, args);';
-		$js[] = 'map.objects.add (marker);';
+		$js[] = "var map = new mxn.Mapstraction (id, '" . $provider . "');";
+		$js[] = 'var coords = new mxn.LatLonPoint (' . $location->lat . ',' . $location->lng . ');';
+		$js[] = 'map.setCenterAndZoom (coords, ' . $args['zoom'] . ');';
+		$js[] = "var opts = {icon: '" . $icon_url . "', iconSize: [32, 32]};";
+		$js[] = 'var marker = new mxn.Marker (coords);';
+		//$js[] = 'marker.setIcon ("' . $icon_url . '", [32, 32]);';
+		$js[] = 'marker.addData (opts);';
+		$js[] = 'map.addMarker (marker);';
+		//$js[] = 'var coords = new nokia.maps.geo.Coordinate (' . $location->lat . ',' . $location->lng . ');';
+		//$js[] = "var args = {'zoomLevel': " . $args['zoom'] . ", 'center': coords};";
+		//$js[] = "var marker = new nokia.maps.map.Marker (coords, {'icon': '" . $icon_url . "'});";
+		//$js[] = "var id = document.getElementById ('" . $args['map-id'] . "');";
+		//$js[] = 'var map = new nokia.maps.map.Display (id, args);';
+		//$js[] = 'map.objects.add (marker);';
 		$js[] = '</script>';
 
 		$content[] = '<div id="' . $args['container-id'] . '" class="' . $args['container-class'] .'" style="width:' . $args['width'] . 'px;">';
