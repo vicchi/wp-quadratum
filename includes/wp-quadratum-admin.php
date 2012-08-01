@@ -1,9 +1,17 @@
 <?php
 
+/**
+ * WP_QuadratumAdmin - handles the back end admin functions for the plugin
+ */
+
 class WP_QuadratumAdmin extends WP_PluginBase {
 	private $mxn;
 	
 	static $tab_names;
+	
+	/**
+	 * Class constructor
+	 */
 	
 	function __construct () {
 		$this->mxn = new WP_MXNHelper;
@@ -22,8 +30,11 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		$this->hook (WP_Quadratum::make_settings_link (), 'admin_settings_link');
 	}
 
+	/**
+	 * "admin_init" action hook; called after the admin panel is initialised.
+	 */
+
 	function admin_init () {
-		error_log ('admin_init');
 		$this->admin_upgrade ();
 		$options = WP_Quadratum::get_option ();
 
@@ -31,6 +42,10 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 			$this->hook ('admin_notices');
 		}
 	}	
+
+	/**
+	 * "admin_notices" action hook; called if the plugin is active but not configured.
+	 */
 
 	function admin_notices () {
 		if (current_user_can ('manage_options')) {
@@ -41,15 +56,23 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		}
 	}
 		
+	/**
+	 * "admin_menu" action hook; called after the basic admin panel menu structure is in
+	 * place.
+	 */
+
 	function admin_menu () {
 		if (function_exists ('add_options_page')) {
 			$page_title = __('WP Quadratum');
 			$menu_title = __('WP Quadratum');
 			add_options_page ($page_title, $menu_title, 'manage_options', __FILE__,
 				array ($this, 'admin_display_settings'));
-			
 		}
 	}
+
+	/**
+	 * "admin_print_scripts" action hook; called to enqueue admin specific scripts.
+	 */
 
 	function admin_print_scripts () {
 		global $pagenow;
@@ -59,14 +82,17 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 				strstr ($_GET['page'], 'wp-quadratum')) {
 			wp_enqueue_script ('postbox');
 			wp_enqueue_script ('dashboard');
-			//wp_enqueue_script ('custom-background');
 			wp_enqueue_script ('jquery');
 			$deps = array ('jquery');
-			//wp_enqueue_script ('wp-quadratum-admin-script', WPQUADRATUM_URL . 'js/wp-quadratum-admin.min.js', $deps);
-			wp_enqueue_script ('wp-quadratum-admin-script', WPQUADRATUM_URL . 'js/wp-quadratum-admin.js', $deps);
+			wp_enqueue_script ('wp-quadratum-admin-script', WPQUADRATUM_URL . 'js/wp-quadratum-admin.min.js', $deps);
+			//wp_enqueue_script ('wp-quadratum-admin-script', WPQUADRATUM_URL . 'js/wp-quadratum-admin.js', $deps);
 		}
 	}
 	
+	/**
+	 * "admin_print_styles" action hook; called to enqueue admin specific CSS.
+	 */
+
 	function admin_print_styles () {
 		global $pagenow;
 
@@ -76,10 +102,15 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 			wp_enqueue_style ('dashboard');
 			wp_enqueue_style ('global');
 			wp_enqueue_style ('wp-admin');
-			wp_enqueue_style ('wp-quadratum-admin',
-				WPQUADRATUM_URL . 'css/wp-quadratum-admin.css');
+			wp_enqueue_style ('wp-quadratum-admin',	WPQUADRATUM_URL . 'css/wp-quadratum-admin.min.css');
+			//wp_enqueue_style ('wp-quadratum-admin',	WPQUADRATUM_URL . 'css/wp-quadratum-admin.css');
 		}
 	}
+
+	/**
+	 * "plugin_action_links_'plugin-name'" action hook; called to add a link to the plugin's
+	 * settings/options panel.
+	 */
 
 	function admin_settings_link ($links) {
 		$settings_link = '<a href="options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php">'
@@ -89,14 +120,27 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		return $links;
 	}
 
+	/**
+	 * Checks for the presence of a settings/options key and if not present, adds the
+	 * key and its associated value.
+	 *
+	 * @param array settings Array containing the current set of settings/options
+	 * @param string key Settings/options key
+	 * @param stirng key Settings/options value for key
+	 */
+
 	function admin_upgrade_option (&$options, $key, $value) {
 		if (!isset ($options[$key])) {
 			$options[$key] = $value;
 		}
 	}
 
+	/**
+	 * Called in response to the "admin_init" action hook; checks the current set of
+	 * settings/options and upgrades them according to the new version of the plugin.
+	 */
+
 	function admin_upgrade () {
-		error_log ('admin_upgrade');
 		$options = null;
 		$upgrade_settings = false;
 		$current_plugin_version = NULL;
@@ -109,7 +153,6 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		}
 
 		if (!is_array ($options)) {
-			error_log ('calling WP_Quadratum::add_settings');
 			WP_Quadratum::add_settings ();
 		}
 
@@ -155,6 +198,11 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		}
 	}
 	
+	/**
+	 * add_options_page() callback function; called to emit the plugin's settings/options
+	 * page.
+	 */
+
 	function admin_display_settings () {
 		$options = $this->admin_save_settings ();
 		
@@ -189,30 +237,29 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 					$maps_settings[] = '<option value="' . $provider . '"' . selected ($options['provider'], $provider, false) . '>' . $chars['description'] . '</option>';
 				}	// end-foreach
 				$maps_settings[] = '</select>';
-				if ($auth_plugin_installed) {
-					if ($auth_plugin_active) {
-						$helper = new WPNokiaAuthHelper ();
 
-						$nokia_settings[] = '<div class="wp-quadratum-success">'
-							. __('WP Nokia Auth is installed and active')
-							. '</div>';
-						$nokia_settings[] = '<p><strong>' . __('App ID') . '</strong></p>
+				if ($auth_plugin_installed && $auth_plugin_active) {
+					$helper = new WPNokiaAuthHelper ();
+
+					$nokia_settings[] = '<div class="wp-quadratum-success">'
+						. __('WP Nokia Auth is installed and active')
+						. '</div>';
+					$nokia_settings[] = '<p><strong>' . __('App ID') . '</strong></p>
 						<input type="text" size="30" disabled value="' . $helper->get_id () . '"><br />';
-						$nokia_settings[] = '<p><strong>' . __('Token / App Code') . '</strong></p>
-							<input type="text" size="30" disabled value="' . $helper->get_token () . '"><br />';
-					}
-
-					else {
-						$nokia_settings[] = '<div class="wp-quadratum-warning">'
-							. __('WP Nokia Auth is installed but not currently active')
-							. '</div>';
-
-					}
+					$nokia_settings[] = '<p><strong>' . __('Token / App Code') . '</strong></p>
+						<input type="text" size="30" disabled value="' . $helper->get_token () . '"><br />';
 				}
 
 				else {
+					if ($auth_plugin_installed && !$auth_plugin_active) {
+						$auth_plugin_status = "installed but not activated";
+					}
+					else {
+						$auth_plugin_status = "not installed";
+					}
+					
 					$nokia_settings[] = '<p>'
-						. sprintf (__('You can use the <a href="%1$s">WP Nokia Auth plugin</a> to manage your Nokia Location Platform API credentials. Or you can obtain Nokia Location API credentials from the <a href="%2$s">Nokia API Registration</a> site.'), 'http://wordpress.org/extend/plugins/wp-nokia-auth/', 'http://api.developer.nokia.com/')
+						. sprintf (__('You\'ve selected Nokia Maps. To use Nokia Maps, you\'ll need API keys; you get get them from the <a href="%1$s" target="_blank">Nokia Developer site</a>. You can use the <a href="%2$s" target="_blank">WP Nokia Auth</a> plugin (<em>%3$s</em>) to manage your Nokia API keys or you can enter them below.'), 'http://api.developer.nokia.com/', 'http://wordpress.org/extend/plugins/wp-nokia-auth/', $auth_plugin_status)
 						. '</p>';
 					$nokia_settings[] = '<p><strong>' . __('App ID') . '</strong><br />
 						<input type="text" name="wp_quadratum_nokia_app_id" id="wp_quadratum_nokia_app_id" value="' . $options['nokia_app_id'] . '" size="35" /><br />
@@ -323,7 +370,7 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 						. __('Once you have successfully registered your site, you\'ll be provided with two <em>keys</em>, the <em>client id</em> and the <em>client secret</em>')
 						. '</p>'
 						. '<p><strong>'
-						. __('Step 2. Copy and paste the supplied Client ID and Client Secret below')
+						. __('Step 2. Copy and paste the supplied Client ID and Client Secret below and click on the "Save Foursquare Settings" button')
 						. '</strong></p>';
 
 					$foursquare_settings[] = '<p><strong>' . __('Foursquare Client ID') . '</strong><br />
@@ -411,9 +458,20 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 				implode ('', $wrapped_content));
 	}
 
+	/**
+	 * Extracts a specific settings/option field from the $_POST array.
+	 *
+	 * @param string field Field name.
+	 * @return string Contents of the field parameter if present, else an empty string.
+	 */
+
 	function admin_option ($field) {
 		return (isset ($_POST[$field]) ? $_POST[$field] : "");
 	}
+
+	/**
+	 * Verifies and saves the plugin's settings/options to the back-end database.
+	 */
 
 	function admin_save_settings () {
 		$options = WP_Quadratum::get_option ();
@@ -476,6 +534,15 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		return $options;
 	}
 	
+	/**
+	 * Creates a postbox entry for the plugin's admin settings/options page.
+	 *
+	 * @param string id CSS id for this postbox
+	 * @param string title Title string for this postbox
+	 * @param string content HTML content for this postbox
+	 * @return string Wrapped postbox content.
+	 */
+
 	function admin_postbox ($id, $title, $content, $hidden=false) {
 		$handle_title = __('Click to toggle');
 
@@ -493,6 +560,15 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 
 		return $postbox_wrap;
 	}
+
+	/**
+	 * Wrap up all the constituent components of the plugin's admin settings/options page.
+	 *
+	 * @param string tab Settings/options tab context name
+	 * @param string title Title for the plugin's admin settings/options page.
+	 * @param string content HTML content for the plugin's admin settings/options page.
+	 * @return string Wrapped HTML content
+	 */
 
 	function admin_wrap ($tab, $title, $content) {
 		$action = admin_url ('options-general.php');
@@ -527,6 +603,13 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 	    </div>
 	<?php	
 	}
+
+	/**
+	 * Emit a tab specific submit button for saving the plugin's settings/options.
+	 *
+	 * @param string tab Settings/options tab context name
+	 * @return string Submit button HTML
+	 */
 
 	function admin_submit ($tab) {
 		$content = array ();
@@ -614,6 +697,14 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		return $this->admin_postbox ('wp-quadratum-colophon', __('Colophon'), $content);
 	}
 
+	/**
+	 * Emit a WordPress standard set of tab headers as part of saving the plugin's
+	 * settings/options.
+	 *
+	 * @param string current Currently selected settings/options tab context name
+	 * @return string Tab headers HTML
+	 */
+
 	function admin_tabs ($current='foursquare') {
 		$content = array ();
 		
@@ -653,7 +744,6 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		delete_option (WP_Quadratum::OPTIONS);
 		WP_Quadratum::add_settings ();
 	}
-	
 	
 }	// end-class WP_QuadratumAdmin
 

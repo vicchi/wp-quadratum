@@ -1,6 +1,8 @@
 <?php
 
-// OAuth callback handler code ...
+/**
+ * Oauth callback handler code ... yes, this is fugly, yes, I know
+ */
 
 if (array_key_exists ('code', $_GET) && !function_exists ('site_url')) {
 	require_once ('../../../../wp-config.php');

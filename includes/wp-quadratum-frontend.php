@@ -1,7 +1,15 @@
 <?php
 
+/**
+ * WP_QuadratumFrontEnd - handles the front end display for the plugin
+ */
+
 class WP_QuadratumFrontEnd extends WP_PluginBase {
 	private	$mxn;
+	
+	/**
+	 * Class constructor
+	 */
 	
 	function __construct () {
 		$this->mxn = new WP_MXNHelper;
@@ -12,52 +20,13 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 		$provider = WP_Quadratum::get_option ('provider');
 		$this->mxn->set_providers (array ($provider));
 		
-		//$this->hook ('wp_head', 'head', 1);
-		//$this->hook ('wp_head', 'head_suffix', 999);
-		//$this->hook ('wp_enqueue_scripts', 'enqueue_scripts');
-		
 		add_shortcode ('wp_quadratum', array ($this, 'shortcode'));
 	}
 	
-	/*function head () {
-		$provider = WP_Quadratum::get_option ('provider');
-		$header = $this->mxn->get_provider_header ($provider);
-		if (isset ($header)) {
-			echo $header;
-		}
-	}*/
+	/**
+	 * WP MXN Helper callback; returns the configured CloudMade API key
+	 */
 	
-	/*function head_suffix () {
-		$provider = WP_Quadratum::get_option ('provider');
-		//echo '<script type="text/javascript" src="https://raw.github.com/vicchi/mxn/master/source/mxn.js?(' . $provider . ')"></script>';
-		$header = $this->mxn->get_provider_init ($provider);
-		if (isset ($header)) {
-			echo $header;
-		}
-	}*/
-	
-	/*function enqueue_scripts () {
-		$provider = WP_Quadratum::get_option ('provider');
-		$core = $this->mxn->get_mxn_script ($provider);
-		if (isset ($core)) {
-			$style = $this->mxn->get_provider_style ($provider);
-			if (isset ($style)) {
-				wp_register_style ($style['handle'], $style['style']);
-				
-				wp_enqueue_style ($style['handle']);
-			}
-
-			$script = $this->mxn->get_provider_script ($provider);
-			if (isset ($script)) {
-				wp_register_script ($script['handle'], $script['script']);
-				wp_register_script ($core['handle'], $core['script']);
-
-				wp_enqueue_script ($script['handle']);
-				wp_enqueue_script ($core['handle']);
-			}
-		}
-	}*/
-
 	function cloudmade_mxn_callback () {
 		$key = WP_Quadratum::get_option ('cloudmade_key');
 		
@@ -66,6 +35,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 		}
 	}
 	
+	/**
+	 * WP MXN Helper callback; returns the configured Nokia API keys
+	 */
+
 	function nokia_mxn_callback () {
 		$app_id = null;
 		$auth_token = null;
@@ -85,8 +58,8 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 		}
 	
 		else {
-			$app_id = WP_Quadratum::get_option ('app_id');
-			$auth_token = WP_Quadratum::get_option ('app_token');
+			$app_id = WP_Quadratum::get_option ('nokia_app_id');
+			$auth_token = WP_Quadratum::get_option ('nokia_app_token');
 		}
 		
 		if (isset ($app_id) && isset ($auth_token)) {
@@ -94,6 +67,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 		}
 	}
 	
+	/**
+	 * WP MXN Helper callback; returns the configured Google API key
+	 */
+
 	function googlev3_mxn_callback () {
 		$key = WP_Quadratum::get_option ('google_key');
 		$sensor = WP_Quadratum::get_option ('google_sensor');
@@ -102,6 +79,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 			return (array ('key' => $key, 'sensor' => $sensor));
 		}
 	}
+
+	/**
+	 * Create the HTML and Javascript for the checkin map
+	 */
 
 	static function render_checkin_map ($args) {
 		// $args = array (
@@ -139,33 +120,18 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 
 		$js = array ();
 		$js[] = '<script type="text/javascript">';
-		/*if ((isset ($args['app-id']) && !empty ($args['app-id'])) && (isset ($args['app-token']) && !empty ($args['app-token']))) {
-			$js[] = 'nokia.maps.util.ApplicationContext.set ({';
-			$js[] = $tab . '"appId": "' . $args['app-id'] . '",';
-			$js[] = $tab . '"authenticationToken": "' . $args['app-token'] . '"';
-			$js[] = '});';
-		}*/
-
 		$js[] = "var id = document.getElementById ('" . $args['map-id'] . "');";
 		$js[] = "var map = new mxn.Mapstraction (id, '" . $provider . "');";
 		$js[] = 'var coords = new mxn.LatLonPoint (' . $location->lat . ',' . $location->lng . ');';
 		$js[] = 'map.setCenterAndZoom (coords, ' . $args['zoom'] . ');';
 		$js[] = "var opts = {icon: '" . $icon_url . "', iconSize: [32, 32]};";
 		$js[] = 'var marker = new mxn.Marker (coords);';
-		//$js[] = 'marker.setIcon ("' . $icon_url . '", [32, 32]);';
 		$js[] = 'marker.addData (opts);';
 		$js[] = 'map.addMarker (marker);';
-		//$js[] = 'var coords = new nokia.maps.geo.Coordinate (' . $location->lat . ',' . $location->lng . ');';
-		//$js[] = "var args = {'zoomLevel': " . $args['zoom'] . ", 'center': coords};";
-		//$js[] = "var marker = new nokia.maps.map.Marker (coords, {'icon': '" . $icon_url . "'});";
-		//$js[] = "var id = document.getElementById ('" . $args['map-id'] . "');";
-		//$js[] = 'var map = new nokia.maps.map.Display (id, args);';
-		//$js[] = 'map.objects.add (marker);';
 		$js[] = '</script>';
 
 		$content[] = '<div id="' . $args['container-id'] . '" class="' . $args['container-class'] .'" style="width:' . $args['width'] . 'px;">';
 		$content[] = '<div id="' . $args['map-id'] . '" class="' . $args['map-class'] . '" style="width:' . $args['width'] . 'px; height:' . $args['height'] . 'px;"></div>';
-//		$content[] = '<div id="' . $args['map-id'] . '" class="' . $args['map-class'] . '" style="width:' . $args['width'] . 'px; height:' . $args['height']'px;">';
 		$content[] = '<div class="' . $args['venue-class'] . '">';
 		$content[] = '<h5>Last seen at <a href="' . $venue_url . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $checkin->createdAt) . '</h5>';
 		$content[] = '</div>';
@@ -173,6 +139,19 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 
 		return array_merge ($content, $js);
 	}
+
+	/**
+	 * Shortcode handler for the [wp_quadratum] shortcode; expands the shortcode to the
+	 * checkin map according to the current set of plugin settings/options.
+	 *
+	 * @param array atts Array containing the optional shortcode attributes specified by
+	 * the current instance of the shortcode.
+	 * @param string content String containing the enclosed content when the shortcode is
+	 * specified in the enclosing form. If the self-closing form is used, this parameter will
+	 * default to null.
+	 * @return string String containing the checkin map, providing that the current set
+	 * of settings/options permit this.
+	 */
 
 	function shortcode ($atts, $content=null) {
 		// TODO: handle self-closing and enclosing shortcode forms properly

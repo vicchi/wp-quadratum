@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * WP_QuadratumWidget - handles the widget for the plugin
+ */
+
 require_once (WPQUADRATUM_PATH . '/foursquare-helper/foursquare-helper.php');
 
 class WP_QuadratumWidget extends WP_Widget {
@@ -8,14 +12,19 @@ class WP_QuadratumWidget extends WP_Widget {
 			'description' => __('Displays your last Foursquare checkin')
 			);
 		parent::WP_Widget ('WP_QuadratumWidget', __('WP Quadratum'), $widget_ops);
-		if (is_active_widget (false, false, $this->id_base)) {
+		/*if (is_active_widget (false, false, $this->id_base)) {
 			add_action ('template_redirect', array ($this, 'widget_external'));
-		}
+		}*/
 	}
 	
-	function widget_external() {
+	/*function widget_external() {
 		wp_enqueue_script ('nokiamaps');
-	}
+	}*/
+	
+	/**
+	 * Outputs the widget settings/options form on the Dashboard's Appearance -> Widgets
+	 * screen
+	 */
 	
 	function form($instance) {
 		$text_stub = '<label for="%s">%s</label><input type="text" id="%s" name="%s" value="%s" class="widefat" />';
@@ -97,6 +106,11 @@ class WP_QuadratumWidget extends WP_Widget {
 		echo $content;
 	}
 	
+	/**
+	 * Processes the widget settings/options form on the Dashboard's Appearance -> Widgets
+	 * screen
+	 */
+
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
 		
@@ -112,6 +126,10 @@ class WP_QuadratumWidget extends WP_Widget {
 		return $instance;
 	}
 	
+	/**
+	 * Outputs the contents of the widget on the front-end
+	 */
+
 	function widget($args, $instance) {
 		extract ($args, EXTR_SKIP);
 
@@ -126,6 +144,10 @@ class WP_QuadratumWidget extends WP_Widget {
 		
 		echo $content;
 	}
+	
+	/**
+	 * Outputs the contents of the checkin map within the widget
+	 */
 	
 	function show_checkin_map($instance) {
 		$content = array ();
