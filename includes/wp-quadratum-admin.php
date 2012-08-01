@@ -594,7 +594,6 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 	                    <div class="meta-box-sortables">
 	                    <?php
 							echo $this->admin_help_and_support ();
-							echo $this->admin_show_colophon ();
 	                    ?>
 	                    </div>
 	                </div>
@@ -673,28 +672,6 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 			. '</p>';
 
 		return $this->admin_postbox ('wp-quadratum-support', __('Help &amp; Support'), $content);
-	}
-
-	/**
-	 * Emits the plugin's colophon side-box for the plugin's admin settings/options page.
-	 */
-
-	function admin_show_colophon() {
-		$content = '<p><em>"When it comes to software, I much prefer free software, because I have very seldom seen a program that has worked well enough for my needs and having sources available can be a life-saver"</em>&nbsp;&hellip;&nbsp;Linus Torvalds</p>';
-
-		$content .= '<p>'
-			. __('For the inner nerd in you, the latest version of WP Quadratum was written using <a href="http://macromates.com/">TextMate</a> on a MacBook Pro running OS X 10.7.3 Lion and tested on the same machine running <a href="http://mamp.info/en/index.html">MAMP</a> (Mac/Apache/MySQL/PHP) before being let loose on the author\'s <a href="http://www.vicchi.org/">blog</a>.')
-			. '<p>';
-
-		$content .= '<p>'
-			. __('The official home for WP Quadratum is on <a href="http://www.vicchi.org/codeage/wp-quadratum/">Gary\'s Codeage</a>; it\'s also available from the official <a href="http://wordpress.org/extend/plugins/wp-quadratum/">WordPress plugins repository</a>. If you\'re interested in what lies under the hood, the code is also on <a href="https://github.com/vicchi/wp-quadratum">GitHub</a> to download, fork and otherwise hack around.')
-			. '<p>';
-
-		$content .= '<p>'
-			. __('WP Quadratum is named after both the Latin words <em>quattor</em>, meaning four and <em>quadratum</em>, meaning square.')
-			. '</p>';
-
-		return $this->admin_postbox ('wp-quadratum-colophon', __('Colophon'), $content);
 	}
 
 	/**
