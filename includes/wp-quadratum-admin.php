@@ -223,7 +223,7 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 		//$openmq_settings = array ();
 		
 		$tab = $this->admin_validate_tab ();
-		$providers = WP_MXNHelper::get_supported_providers ();
+		$providers = $this->mxn->get_supported_providers ();
 		
 		switch ($tab) {
 			case 'maps':
