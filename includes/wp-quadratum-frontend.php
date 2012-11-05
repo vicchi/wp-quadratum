@@ -18,7 +18,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		$this->mxn->register_callback ('googlev3', array ($this, 'googlev3_mxn_callback'));
 
 		$provider = WP_Quadratum::get_option ('provider');
-		$this->mxn->set_providers (array ($provider));
+		$this->mxn->set_frontend_providers (array ($provider));
 		
 		add_shortcode ('wp_quadratum', array ($this, 'shortcode'));
 	}

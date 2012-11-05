@@ -185,6 +185,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$this->admin_upgrade_option ($options, 'google_sensor', 'false');
 					$this->admin_upgrade_option ($options, 'cloudmade_key', '');
 				
+				case '120':
 					$options['version'] = WP_Quadratum::VERSION;
 					$upgrade_settings = true;
 
