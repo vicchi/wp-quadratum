@@ -1,9 +1,0 @@
-[submodule "wp-plugin-base"]
-	path = wp-plugin-base
-	url = git://github.com/vicchi/wp-plugin-base.git
-[submodule "foursquare-helper"]
-	path = foursquare-helper
-	url = git://github.com/vicchi/foursquare-helper.git
-[submodule "wp-mxn-helper"]
-	path = wp-mxn-helper
-	url = git://github.com/vicchi/wp-mxn-helper.git
