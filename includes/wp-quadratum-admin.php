@@ -84,8 +84,16 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			wp_enqueue_script ('dashboard');
 			wp_enqueue_script ('jquery');
 			$deps = array ('jquery');
-			wp_enqueue_script ('wp-quadratum-admin-script', WPQUADRATUM_URL . 'js/wp-quadratum-admin.min.js', $deps);
-			//wp_enqueue_script ('wp-quadratum-admin-script', WPQUADRATUM_URL . 'js/wp-quadratum-admin.js', $deps);
+			
+			if (WP_DEBUG || WPQUADRATUM_DEBUG) {
+				$js_url = 'js/wp-quadratum-admin.js';
+			}
+			
+			else {
+				$js_url = 'js/wp-quadratum-admin.min.js';
+			}
+			
+			wp_enqueue_script ('wp-quadratum-admin-script', WPQUADRATUM_URL . $js_url, $deps);
 		}
 	}
 	
@@ -102,8 +110,16 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			wp_enqueue_style ('dashboard');
 			wp_enqueue_style ('global');
 			wp_enqueue_style ('wp-admin');
-			wp_enqueue_style ('wp-quadratum-admin',	WPQUADRATUM_URL . 'css/wp-quadratum-admin.min.css');
-			//wp_enqueue_style ('wp-quadratum-admin',	WPQUADRATUM_URL . 'css/wp-quadratum-admin.css');
+			
+			if (WP_DEBUG || WPQUADRATUM_DEBUG) {
+				$css_url = 'css/wp-quadratum-admin.css';
+			}
+			
+			else {
+				$css_url = 'css/wp-quadratum-admin.min.css';
+			}
+			
+			wp_enqueue_style ('wp-quadratum-admin',	WPQUADRATUM_URL . $css_url);
 		}
 	}
 

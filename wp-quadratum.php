@@ -12,6 +12,7 @@ Text Domain: wp-quadratum
 
 define ('WPQUADRATUM_URL', plugin_dir_url (__FILE__));
 define ('WPQUADRATUM_PATH', plugin_dir_path (__FILE__));
+//define ('WPQUADRATUM_DEBUG', true);
 
 /*
  * Determine WordPress directory constants.
