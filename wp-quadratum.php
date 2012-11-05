@@ -31,8 +31,8 @@ if (!defined ('WPMU_PLUGIN_URL'))
 if (!defined ('WPMU_PLUGIN_DIR'))
 	define ('WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins');
 
-require_once (WPQUADRATUM_PATH . '/wp-plugin-base/wp-plugin-base.php');
-require_once (WPQUADRATUM_PATH . '/wp-mxn-helper/wp-mxn-helper.php');
+require_once (WPQUADRATUM_PATH . '/includes/wp-plugin-base/wp-plugin-base.php');
+require_once (WPQUADRATUM_PATH . '/includes/wp-mxn-helper/wp-mxn-helper.php');
 require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
 
 define ('WPNAUTH_PLUGIN_HELPER', WP_PLUGIN_DIR . '/wp-nokia-auth/wp-nokia-auth-helper.php');
@@ -44,7 +44,7 @@ if (file_exists (WPNAUTH_PLUGIN_HELPER)) {
 
 include_once (ABSPATH . 'wp-admin/includes/plugin.php');
 
-class WP_Quadratum extends WP_PluginBase {
+class WP_Quadratum extends WP_PluginBase_v1_1 {
 	static $instance;
 	
 	const OPTIONS = 'wp_quadratum_settings';

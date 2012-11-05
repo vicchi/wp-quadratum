@@ -4,7 +4,7 @@
  * WP_QuadratumAdmin - handles the back end admin functions for the plugin
  */
 
-class WP_QuadratumAdmin extends WP_PluginBase {
+class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	private $mxn;
 	
 	static $tab_names;
@@ -14,7 +14,7 @@ class WP_QuadratumAdmin extends WP_PluginBase {
 	 */
 	
 	function __construct () {
-		$this->mxn = new WP_MXNHelper;
+		$this->mxn = new WP_MXNHelper_v2_0;
 		
 		self::$tab_names = array (
 			'foursquare' => "Foursquare",

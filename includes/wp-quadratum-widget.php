@@ -4,7 +4,7 @@
  * WP_QuadratumWidget - handles the widget for the plugin
  */
 
-require_once (WPQUADRATUM_PATH . '/foursquare-helper/foursquare-helper.php');
+require_once (WPQUADRATUM_PATH . '/includes/foursquare-helper/foursquare-helper.php');
 
 class WP_QuadratumWidget extends WP_Widget {
 	function __construct() {

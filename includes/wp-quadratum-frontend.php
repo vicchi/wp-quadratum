@@ -4,7 +4,7 @@
  * WP_QuadratumFrontEnd - handles the front end display for the plugin
  */
 
-class WP_QuadratumFrontEnd extends WP_PluginBase {
+class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	private	$mxn;
 	
 	/**
@@ -12,7 +12,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase {
 	 */
 	
 	function __construct () {
-		$this->mxn = new WP_MXNHelper;
+		$this->mxn = new WP_MXNHelper_v2_0;
 		$this->mxn->register_callback ('cloudmade', array ($this, 'cloudmade_mxn_callback'));
 		$this->mxn->register_callback ('nokia', array ($this, 'nokia_mxn_callback'));
 		$this->mxn->register_callback ('googlev3', array ($this, 'googlev3_mxn_callback'));
