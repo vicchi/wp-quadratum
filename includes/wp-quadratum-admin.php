@@ -663,7 +663,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			. sprintf (__('Firstly ... take a look at <a href="%s">this</a> before firing off a question.'), 'http://www.vicchi.org/2012/03/31/asking-for-wordpress-plugin-help-and-support-without-tears/')
 			. '</li>'
 			. '<li>'
-			. __('Then ... ask a question on the <a href="http://wordpress.org/tags/wp-quadratum?forum_id=10">WordPress support forum</a>; this is by far the best way so that other users can follow the conversation.')
+			. __('Then ... ask a question on the <a href="http://wordpress.org/support/plugin/wp-quadratum">WordPress support forum</a>; this is by far the best way so that other users can follow the conversation.')
 			. '</li>'
 			. '<li>'
 			. __('Or ... ask me a question on Twitter; I\'m <a href="http://twitter.com/vicchi">@vicchi</a>.')
@@ -683,7 +683,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			. __('Rate the plugin on the <a href="http://wordpress.org/extend/plugins/wp-quadratum/">WordPress plugin repository</a>.')
 			. '</li>'
 			. '<li>'
-			. __('WP Quadratum is both free as in speech and free as in beer. No donations are required; <a href="http://www.vicchi.org/codeage/donate/">here\'s why</a>.')
+			. __('WP Quadratum is both free as in speech and free as in beer; <a href="http://www.vicchi.org/codeage/donate/">here\'s why</a>.')
 			. '</li>'
 			. '</ul>'
 			. '</p>';
