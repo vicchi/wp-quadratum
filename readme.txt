@@ -4,7 +4,7 @@ Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.4
 Tested up to: 3.4.1
-Stable tag: 1.1
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,8 @@ Setting and options include:
 1. Choose the width and height of the widget and map on the sidebar.
 1. Choose the zoom level of the map display.
 1. Choose whether to show private checkins on the map.
+
+The <em>strapline</em> text containing the venue name, venue URL and timestamp of your last Foursquare checkin can be customised via the plugin's filters. See the *Filter Support And Usage* section for more information.
 
 The current version of this plugin allows you to associate a single Foursquare account with your WordPress site; associating multiple Foursquare accounts, one per user account is not currently supported.
 
@@ -82,6 +84,10 @@ v1.1 of WP Quadratum uses [Mapstraction](http://mapstraction.com/) to support mu
 
 Right now, all of these maps providers are supported by Mapstraction but they have issues when the sidebar's widget map is so small (200px by 200px by default). As and when these issues are resolved in Mapstraction, they'll be supported by a future release of the plugin.
 
+= Can I change the format of the strapline that appears under the checkin map? =
+
+Yes. The `wp_quadratum_strapline` filter is for just this purpose. The filter is passed the default strapline as well as the URL to the Foursquare venue checked in at, the name of the venue and the date and time of the checkin as a UNIX timestamp. See the *Filter Support And Usage* section for more information.
+
 = I want to amend/hack/augment this plugin; can I do the same? =
 
 Totally; this plugin is licensed under the GNU General Public License v2 (GPLV2). See http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt for the full license terms.
@@ -109,7 +115,14 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.1 (2012.07.01)
+The current version is 1.2.0 (2012.11.06)
+
+= 1.2 =
+* Released: 2012.11.06
+* Added: Support for the `wp_quadratum_strapline` filter.
+* Added: Enqueue non-minified versions of the plugin's CSS and JS files if WP_DEBUG or WQUADRATUM_DEBUG are defined.
+* Other: Updated to latest versions of WP_PluginBase and WP_MXNHelper.
+* Other: Moved all submodule classes/libraries from the plugin's root directory to /includes.
 
 = 1.1 =
 * Released: 2012.07.01
@@ -130,8 +143,11 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+= 1.2 =
+Adds support for the `wp_quadratum_strapline` filter plus internal housekeeping and library upgrades.
+
 = 1.1 =
-Adds support for multiple map privders, Internet Explorer map rendering issues and a new shortcode. This is the 4th. version of WP Quadratum.
+Adds support for multiple map providers, Internet Explorer map rendering issues and a new shortcode. This is the 4th. version of WP Quadratum.
 
 = 1.0.2 =
 This is the 3rd version of WP Quadratum; makes widget code W3C/HTML4 compliant, which was breaking widget display on Internet Explorer.
@@ -163,3 +179,25 @@ The `height` attribute, in conjunction with the `width` attribute specifies the 
 = The "zoom" Attribute =
 
 The `zoom` attribute specifies the zoom level to be used when displaying the checkin map. If omitted, the zoom level defaults to a value of `16` which is roughly analogous to a neighbourhood zoom.
+
+== Filter Support And Usage ==
+
+WP Quadratum supports a single filter, which is described below.
+
+= wp_quadratum_strapline =
+
+Applied to the strapline that is displayed via the plugin's widget or shortcode. The strapline is the text that appears immediately below the checkin map.
+
+*Example:* Change the date and time formatting in the strapline
+
+`add_filter ('wp_quadratum_strapline', 'format_strapline', 10, 2);
+function format_strapline ($content, $params) {
+	// $params = array (
+	//		'venue-url' => '4Sq venue url for checkin',
+	//		'venue-name' => 'checkin venue name',
+	//		'checked-in-at' => 'timestamp of checkin'
+	//	);
+	
+	$strapline = '<h5>Last seen at <a href="' . $params['venue-url'] . '" target="_blank">' . $params['venue-name'] . '</a> on ' . date ('l jS \of F Y h:i:s A', $params['checked-in-at']) . '</h5>';
+	return $strapline;
+}`
