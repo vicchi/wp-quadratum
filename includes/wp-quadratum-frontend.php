@@ -133,7 +133,16 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		$content[] = '<div id="' . $args['container-id'] . '" class="' . $args['container-class'] .'" style="width:' . $args['width'] . 'px;">';
 		$content[] = '<div id="' . $args['map-id'] . '" class="' . $args['map-class'] . '" style="width:' . $args['width'] . 'px; height:' . $args['height'] . 'px;"></div>';
 		$content[] = '<div class="' . $args['venue-class'] . '">';
-		$content[] = '<h5>Last seen at <a href="' . $venue_url . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $checkin->createdAt) . '</h5>';
+		
+		$params = array (
+			'venue-url' => $venue_url,
+			'venue-name' => $venue->name,
+			'checked-in-at' => $checkin->createdAt
+		);
+		
+		$strapline = '<h5>Last seen at <a href="' . $venue_url . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $checkin->createdAt) . '</h5>';
+		$content[] = apply_filters ('wp_quadratum_strapline', $strapline, $params);
+		
 		$content[] = '</div>';
 		$content[] = '</div>';
 
