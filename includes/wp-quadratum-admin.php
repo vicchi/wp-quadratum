@@ -406,7 +406,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						$client_id = $options['client_id'];
 						$client_secret = $options['client_secret'];
 						$redirect_url = WP_Quadratum::make_redirect_url ();
-						$fh = new FoursquareHelper ($client_id, $client_secret, $redirect_url);
+						$fh = new FoursquareHelper_v1_0 ($client_id, $client_secret, $redirect_url);
 						$foursquare_settings[] = '<p class="submit">'
 							. '<a href="' . $fh->authentication_link () . '" class="button-primary">'
 							. __('Connect to Foursquare') . '</a>'

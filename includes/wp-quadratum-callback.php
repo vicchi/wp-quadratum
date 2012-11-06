@@ -16,7 +16,7 @@ if (array_key_exists ('code', $_GET) && !function_exists ('site_url')) {
 		. dirname (plugin_basename (__FILE__))
 		. '/wp-quadratum-callback.php';
 	
-	$fh = new FoursquareHelper ($client_id, $client_secret, $redirect_url);
+	$fh = new FoursquareHelper_v1_0 ($client_id, $client_secret, $redirect_url);
 	
 	$token = $fh->get_token ($_GET['code']);
 	

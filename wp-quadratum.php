@@ -250,7 +250,7 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 		$endpoint = "users/self/checkins";
 		$params = array ('limit' => 1);
 
-		$fsq = new FoursquareHelper ($client_id, $client_secret, $redirect_url);
+		$fsq = new FoursquareHelper_v1_0 ($client_id, $client_secret, $redirect_url);
 		$fsq->set_access_token ($oauth_token);
 		$rsp = $fsq->get_private ($endpoint, $params);
 		$json = json_decode ($rsp);
