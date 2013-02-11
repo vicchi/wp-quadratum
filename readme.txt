@@ -120,7 +120,7 @@ The current version is 1.2.0 (2012.11.06)
 = 1.2 =
 * Released: 2012.11.06
 * Added: Support for the `wp_quadratum_strapline` filter.
-* Added: Enqueue non-minified versions of the plugin's CSS and JS files if WP_DEBUG or WQUADRATUM_DEBUG are defined.
+* Added: Enqueue non-minified versions of the plugin's CSS and JS files if WP_DEBUG or WPQUADRATUM_DEBUG are defined.
 * Other: Updated to latest versions of WP_PluginBase and WP_MXNHelper.
 * Other: Moved all submodule classes/libraries from the plugin's root directory to /includes.
 
