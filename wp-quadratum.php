@@ -3,7 +3,7 @@
 Plugin Name: WP Quadratum
 Plugin URI: http://www.vicchi.org/codeage/wp-quadratum/
 Description: A WordPress plugin to display your last Foursquare checkin as a map widget, fully authenticated via OAuth 2.0.
-Version: 1.2.0
+Version: 1.2.1
 Author: Gary Gale
 Author URI: http://www.garygale.com/
 License: GPL2
@@ -49,8 +49,8 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	static $instance;
 	
 	const OPTIONS = 'wp_quadratum_settings';
-	const VERSION = '120';
-	const DISPLAY_VERSION = 'v1.2.0';
+	const VERSION = '121';
+	const DISPLAY_VERSION = 'v1.2.1';
 	
 	/**
 	 * Class constructor
