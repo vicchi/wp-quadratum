@@ -373,21 +373,26 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						. '</div>';
 
 					$foursquare_settings[] = '<div><p>'
-						. __('To display your Foursquare checkins, WP Quadratum needs to be authorised to access your Foursquare account information; this is a simple, safe and secure 3 step process. QP Quadratum never sees your account login information and cannot store any personally identifiable information.')
+						. __('To display your Foursquare checkins, WP Quadratum needs to be authorised to access your Foursquare account information; this is a simple, safe and secure 3 step process. WP Quadratum never sees your account login information and cannot store any personally identifiable information.')
 						. '</p>'
 						. '<p><strong>'
-						. sprintf (__('Step 1. Register this WordPress site as a Foursquare application on the <a target="_blank" href="%s">Foursquare OAuth Consumer Registration</a> page'), 'https://foursquare.com/oauth/register')
+						. sprintf (__('Step 1. Register this WordPress site as a Foursquare app on the <a target="_blank" href="%s">Foursquare App Registration</a> page'), 'https://foursquare.com/developers/register')
 						. '</strong></p><p>'
 						. __('If you\'re not currently logged into your Foursquare account, you\'ll need to login with the Foursquare account whose checkins you want WP Quadratum to display.')
+
 						. '<ol>'
-						. '<li>' . __('The <strong>Application Name</strong> is a label you want to use to identify this connection to your Foursquare account') . '</li>'
-						. '<li>' . sprintf (__('The <strong>Application Web Site</strong> is the URL of this Wordpress site, which is <strong>%s</strong>'), home_url ()) . '</li>'
-						. '<li>' . sprintf (__('The <strong>Callback URL</strong> should be set to <strong>%s</strong>'), plugins_url() . '/wp-quadratum/includes/wp-quadratum-callback.php') . '</li>'
+						. '<li>' . __('<strong>Your app name</strong> is a label you will use to identify this connection to your Foursquare account', 'wp-quadratum') . '</li>'
+						. '<li>' . sprintf (__('The <strong>Download / welcome page url</strong> is the URL of your WordPress site - <em>%s</em>', 'wp-quadratum'), home_url ()) . '</li>'
+						. '<li>' . __('The <strong>Your privacy policy url</strong> can be left blank', 'wp-quadratum') . '</li>'
+						. '<li>' . sprintf (__('The <strong>Redirect URI(s)</strong> should be set to <em>%s</em>', 'wp-quadratum'), plugins_url () . '/wp-quadratum/includes/wp-quadratum-callback.php') . '</li>'
+						. '<li>' . __('The <strong>Push API Notifications</strong> should be set to <em>Disable pushes to this app</em>', 'wp-quadratum') . '</li>'
+						. '<li>' . __('The <strong>Gallery info</strong> and <strong>Install options</strong> sections can be left blank and at their default values', 'wp-quadratum') . '</li>'
+						. '<li>' . __('Click on <em>Save Changes</em> to generate your Foursquare app keys.</li>', 'wp-quadratum')
 						. '</ol>'
-						. __('Once you have successfully registered your site, you\'ll be provided with two <em>keys</em>, the <em>client id</em> and the <em>client secret</em>')
+						. __('Once you have successfully registered your site, you\'ll be provided with two <em>keys</em>, the <em>Client id</em> and the <em>Client secret</em>')
 						. '</p>'
 						. '<p><strong>'
-						. __('Step 2. Copy and paste the supplied Client ID and Client Secret below and click on the "Save Foursquare Settings" button')
+						. __('Step 2. Copy and paste the supplied Client id and Client secret below and click on the "Save Foursquare Settings" button')
 						. '</strong></p>';
 
 					$foursquare_settings[] = '<p><strong>' . __('Foursquare Client ID') . '</strong><br />
@@ -400,7 +405,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 					if (!empty ($options['client_id'])) {
 						$foursquare_settings[] = '<p><strong>'
-						. __('Step 3. You should now be authorised and ready to go; click on the Connect button below.')
+						. __('Step 3. You should now be authorised and ready to go; click on the <em>Connect to Foursquare</em> button below.')
 						. '</strong></p>';
 
 						$client_id = $options['client_id'];
