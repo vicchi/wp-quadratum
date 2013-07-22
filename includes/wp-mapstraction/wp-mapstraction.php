@@ -15,8 +15,6 @@ if (!class_exists('WP_Mapstraction')) {
 		private $footer = false;
 		
 		private function __construct() {
-			//error_log('WP_Mapstraction url: ' . WPMAPSTRACTION_URL);
-			//error_log('WP_Mapstraction path: ' . WPMAPSTRACTION_PATH);
 			$this->display = array();
 			
 			$this->core = array(
@@ -129,107 +127,69 @@ if (!class_exists('WP_Mapstraction')) {
 		}
 		
 		public function wp_enqueue_scripts() {
-			//error_log('wp-mapstraction::wp_enqueue_scripts++');
-			
 			$deps = array();
 			foreach ($this->display as $map => $args) {
 				$deps[] = $this->maps[$map]['script']['handle'];
-				//error_log('Adding ' . $this->maps[$map]['script']['handle'] . ' as a dependency for ' . $this->core['handle']);
 			}
 
-			//$deps = array_keys($this->display);
-			//$maps = implode(',', $deps);
-			//error_log('WP_Mapstraction Mapstraction depends: ' . var_export($deps, true));
 			$src = sprintf($this->core['src'], implode(',', array_keys($this->display)));
-			//error_log('WP_Mapstraction Mapstraction source: ' . $src);
 			$handle = $this->core['handle'];
-			//$deps = $this->core['deps'];
-			//$footer = $this->core['footer'];
 			$footer = $this->footer;
-			//error_log ($handle . '=' . $src);
-
-			//error_log('Enqueueing handle: ' . $handle . ', deps: '. implode(',', $deps) . ', src: ' . $src);
 			wp_enqueue_script($handle, $src, $deps, null, $footer);
 			
 			foreach ($this->display as $map => $status) {
-				//error_log('Calling enqueue_script for ' . $map);
 				$this->enqueue_script($map);
 			}
-
-			$handle = 'wp-mapstraction-js';
-			$src = WPMAPSTRACTION_URL . 'js/wp-mapstraction.js';
-			//error_log('handle: ' . $handle . ', src:' . $src);
-			$deps = array('jquery');
-			
-			//error_log('Enqueueing handle: ' . $handle . ', deps: '. implode(',', $deps) . ', src: ' . $src);
-			wp_enqueue_script($handle, $src, $deps, null, $footer);
-
 
 			$handle = 'wp-mapstraction-css';
 			$src = WPMAPSTRACTION_URL . 'css/wp-mapstraction.css';
 			$deps = array();
 			$ver = false;
 			$media = 'all';
-			//error_log('Enqueueing handle: ' . $handle . ', deps: '. implode(',', $deps) . ', src: ' . $src);
 			wp_enqueue_style($handle, $src, $deps, $ver, $media);
+
+			$handle = 'wp-mapstraction-js';
+			$src = WPMAPSTRACTION_URL . 'js/wp-mapstraction.js';
+			$deps = array('jquery');
+			
+			wp_enqueue_script($handle, $src, $deps, null, $footer);
 			
 			if (count($this->auth) !== 0) {
-				//error_log('Localising ' . $handle . ' as WPMapstraction');
 				wp_localize_script($handle, 'WPMapstraction', $this->auth);
 			}
-			else {
-				//error_log('$this->auth == 0');
-			}
-			//error_log('wp-mapstraction::wp_enqueue_scripts--');
 		}
 		
 		private function enqueue_script($map) {
-			//error_log('wp-mapstraction::enqueue_script++');
-			//error_log('Handling map ' . $map);
-
 			$params = null;
 			
 			if ($this->maps[$map]['script']['auth']) {
-				//error_log($map . ' has auth');
 				$func = $map . '_auth';
 				if (method_exists($this, $func)) {
-					//error_log('WP_Mapstraction auth func: ' . $func);
 					$params = call_user_func(array($this, $func));
-					//error_log('WP_Mapstraction return: ' . var_export($params, true));
 					
 					if ($this->maps[$map]['script']['auth-type'] === 'js') {
 						$this->auth[$map] = $params;
 					}
 				}
-				else {
-					//error_log('WP_Mapstraction cannot find instance of ' . $func);
-				}
 			}
 
 			if (!empty($this->maps[$map]['meta'])) {
-				//error_log($map . ' has meta');
-				//error_log($this->maps[$map]['meta']);
 				echo $this->maps[$map]['meta'] . PHP_EOL;
 			}
 
 			if (!empty($this->maps[$map]['style'])) {
-				//error_log($map . ' has style');
 				foreach ($this->maps[$map]['style'] as $handle => $vars) {
 					$src = $vars['src'];
 					$deps = $vars['deps'];
-					//error_log ($handle . '=' . $src);
 					wp_enqueue_style($handle, $src, $deps);
 					
 					if ($vars['conditional']) {
-						//error_log($map . ' has conditional style');
-						//error_log($handle . '=' . $vars['conditional']);
 						global $wp_styles;
 						$wp_styles->add_data($handle, 'conditional', $vars['conditional']);
 					}
 				}
 			}
 			
-			//error_log($map . ' has script');
 			$handle = $this->maps[$map]['script']['handle'];
 			$src = $this->maps[$map]['script']['src'];
 			
@@ -242,24 +202,13 @@ if (!class_exists('WP_Mapstraction')) {
 			
 			$deps = $this->maps[$map]['script']['deps'];
 			$footer = $this->footer;
-			//error_log ($handle . '=' . $src);
-			if ($deps) {
-				//error_log('Enqueueing handle: ' . $handle . ', deps: '. implode(',', $deps) . ', src: ' . $src);
-			}
-			else {
-				//error_log('Enqueueing handle: ' . $handle . ', deps: (none), src: ' . $src);
-			}
 			wp_enqueue_script($handle, $src, $deps, null, $footer);
-			//error_log('wp-mapstraction::enqueue_script--');
 		}
 
 		public function add_map($map) {
-			//error_log('wp-mapstraction::add_map++');
-			//error_log('WP_Mapstraction handling map ' . $map);
 			if (isset($map) && !empty($map) && array_key_exists($map, $this->maps)) {
 				$this->display[$map] = true;
 			}
-			//error_log('wp-mapstraction::add_map--');
 		}
 		
 		public function add_maps($maps) {
@@ -304,26 +253,21 @@ if (!class_exists('WP_Mapstraction')) {
 		
 		private function googlev3_auth() {
 			$params = array('key' => null, 'sensor' => 'false');
-			//error_log('WP_Mapstraction calling filter on mapstraction-googlev3-auth');
 			return apply_filters('mapstraction-googlev3-auth', $params);
 		}
 		
 		private function nokia_auth() {
-			//error_log('wp-mapstraction::nokia_auth++');
 			$params = array('app-id' => null, 'auth-token' => null);
-			//error_log('wp-mapstraction::nokia_auth--');
 			return apply_filters('mapstraction-nokia-auth', $params);
 		}
 		
 		private function microsoft7_auth() {
 			$params = array('key' => null);
-			//error_log('WP_Mapstraction calling filter on mapstraction-microsoft7-auth');
 			return apply_filters('mapstraction-microsoft7-auth', $params);
 		}
 		
 		private function openmq_auth() {
 			$params = array('key' => null);
-			//error_log('WP_Mapstraction calling filter on mapstraction-openmq-auth');
 			return apply_filters('mapstraction-openmq-auth', $params);
 		}
 	}	// end-class WP_Mapstraction

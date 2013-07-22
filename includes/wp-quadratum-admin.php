@@ -167,7 +167,6 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	 */
 
 	function admin_upgrade () {
-		//error_log('wp-quadratum-admin::admin_upgrade++');
 		$options = null;
 		$upgrade_settings = false;
 		$current_plugin_version = NULL;
@@ -176,7 +175,6 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		if (is_array ($options) &&
 				!empty ($options['version']) &&
 				$options['version'] == WP_Quadratum::VERSION) {
-			//error_log('wp-quadratum-admin::admin_upgrade--');
 			return;
 		}
 
@@ -233,7 +231,6 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				update_option (WP_Quadratum::OPTIONS, $options);
 			}
 		}
-		//error_log('wp-quadratum-admin::admin_upgrade--');
 	}
 	
 	/**

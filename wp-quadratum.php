@@ -112,13 +112,10 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 */
 	 
 	function plugins_loaded () {
-		//error_log('wp-quadratum::plugins_loaded++');
 		register_activation_hook (__FILE__, array ($this, 'add_settings'));
 		
 		$this->hook ('init');
 		$this->hook ('widgets_init');
-		$this->hook('wp_loaded');
-		//$this->hook ('wp_mxn_helper_providers', 'trim_mapstraction_providers');
 		
 		if (is_admin ()) {
 			// For admin_init, admin_menu, admin_print_styles, admin_print_scripts and
@@ -137,54 +134,36 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 			$map = $options['provider'];
 			$maps = WP_Mapstraction::get_instance()->get_supported_maps();
 			if ($maps[$map]['script']['auth']) {
-				//error_log('Map type ' . $map . ' needs authentication');
 				$hook = 'mapstraction-' . $map . '-auth';
 				$hook_func = $map . '_auth';
-				//error_log('Hooking ' . $hook . ' to function ' . $hook_func);
 				$this->hook($hook, $hook_func);
 			}
-			else {
-				//error_log('WP_Quadratum Map type ' . $map . ' does not need authentication');
-			}
+
 			WP_Mapstraction::get_instance()->set_footer(true);
 			WP_Mapstraction::get_instance()->add_map($map);
 			
 		}
-		//error_log('wp-quadratum::plugins_loaded--');
 	}
 	
 	function nokia_auth() {
-		//error_log('wp-quadratum::nokia_auth++');
 		$options = WP_Quadratum::get_option();
-		//error_log('app-id: ' . $options['nokia_app_id']);
-		//error_log('app-token: ' . $options['nokia_app_token']);
-		//error_log('wp-quadratum::nokia_auth--');
 		return (array('app-id' => $options['nokia_app_id'],
 			'auth-token' => $options['nokia_app_token']));
 	}
 	
 	function googlev3_auth() {
-		//error_log('WP_Quadratum googlev3_auth++');
 		$options = WP_Quadratum::get_option();
-		
-		//error_log('WP_Quadratum googlev3_auth--');
 		return (array('key' => $options['google_key'],
 			'sensor' => $options['google_sensor']));
 	}
 	
 	function microsoft7_auth() {
-		//error_log('WP_Quadratum microsoft7_auth++');
 		$options = WP_Quadratum::get_option();
-		
-		//error_log('WP_Quadratum microsoft7_auth--');
 		return (array('key' => $options['microsoft7_key']));
 	}
 	
 	function openmq_auth() {
-		//error_log('WP_Quadratum openmq_auth++');
 		$options = WP_Quadratum::get_option();
-		
-		//error_log('WP_Quadratum openmq_auth--');
 		return (array('key' => $options['openmq_key']));
 	}
 	
@@ -212,10 +191,8 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 */
 
 	function init () {
-		//error_log('wp_quadratum::init++');
 		$lang_dir = basename (dirname (__FILE__)) . DIRECTORY_SEPARATOR . 'lang';
 		load_plugin_textdomain ('wp-quadratum', false, $lang_dir);
-		//error_log('wp_quadratum::init--');
 	}
 	
 	/**
@@ -223,15 +200,9 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 */
 
 	function widgets_init () {
-		//error_log('wp_quadratum::widgets_init++');
-		//error_log('wp_quadratum::widgets_init--');
 		return register_widget ('WP_QuadratumWidget');
 	}
 	
-	function wp_loaded() {
-		//error_log('wp_quadratum::wp_loaded++');
-		//error_log('wp_quadratum::wp_loaded--');
-	}
 	/**
 	 * plugin activation / "activate_pluginname" action hook; called when the plugin is
 	 * first activated.
