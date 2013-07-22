@@ -94,16 +94,6 @@ class WP_QuadratumWidget extends WP_Widget {
 				)
 			. '</p>';
 
-		$content .= '<p>'
-			. sprintf ($text_stub,
-				$this->get_field_id ('id'),
-				__('Widget Id'),
-				$this->get_field_id ('id'),
-				$this->get_field_name ('id'),
-				esc_attr ($instance['id'])
-				)
-			. '</p>';
-			
 		echo $content;
 		//error_log('wp-quadratum-widget::form--');
 	}
@@ -124,7 +114,6 @@ class WP_QuadratumWidget extends WP_Widget {
 		if (isset ($instance['private'])) {
 			$instance['private'] = (int)$new_instance['private'];
 		}
-		$instance['id'] = (int)strip_tags($new_instance['id']);
 		
 		//error_log('wp-quadratum-widget::update--');
 		return $instance;
