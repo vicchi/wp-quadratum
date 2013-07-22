@@ -36,7 +36,7 @@ if (!class_exists('WP_Quadratum')) {
 		 */
 
 		static function make_settings_link () {
-			return 'plugin_action_links_' . plugin_basename (__FILE__);
+			return 'plugin_action_links_' . WPQUADRATUM_NAME;
 		}
 	
 		/**
@@ -56,14 +56,14 @@ if (!class_exists('WP_Quadratum')) {
 				// For admin_init, admin_menu, admin_print_styles, admin_print_scripts and
 				// plugin_action_links hooks, now see includes/wp-quadratum-admin.php
 
-				require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-admin.php');
+				require_once (WPQUADRATUM_ADMIN_SRC);
 			}
 
 			else {
 				// For wp_head and wp_head_scripts hooks and for shortcode support, now see
 				// includes/wp-quadratum-frontend.php
 
-				require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-frontend.php');
+				require_once (WPQUADRATUM_FRONTEND_SRC);
 			
 				$options = WP_Quadratum::get_option();
 				$map = $options['provider'];

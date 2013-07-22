@@ -12,6 +12,7 @@ Text Domain: wp-quadratum
 
 define('WPQUADRATUM_URL', plugin_dir_url (__FILE__));
 define('WPQUADRATUM_PATH', plugin_dir_path (__FILE__));
+define('WPQUADRATUM_NAME', plugin_basename(__FILE__));
 //define ('WPQUADRATUM_DEBUG', true);
 
 /*
@@ -32,14 +33,21 @@ if (!defined('WPMU_PLUGIN_URL'))
 if (!defined('WPMU_PLUGIN_DIR'))
 	define('WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins');
 
+define('WPMAPSTRACTION_SRC', WPQUADRATUM_PATH . 'includes/wp-mapstraction/class-wp-mapstraction.php');
 define('WPQUADRATUM_SRC', WPQUADRATUM_PATH . 'includes/class-wp-quadratum.php');
+define('WPQUADRATUM_WIDGET_SRC', WPQUADRATUM_PATH . 'includes/class-wp-quadratum-widget.php');
+define('WPQUADRATUM_ADMIN_SRC', WPQUADRATUM_PATH . 'includes/class-wp-quadratum-admin.php');
+define('WPQUADRATUM_FRONTEND_SRC', WPQUADRATUM_PATH . 'includes/class-wp-quadratum-frontend.php');
 
-require_once(WPQUADRATUM_PATH . '/includes/wp-plugin-base/wp-plugin-base.php');
-require_once(WPQUADRATUM_PATH . '/includes/wp-mapstraction/wp-mapstraction.php');
-require_once(WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
+define('FOURSQUARE_HELPER_SRC', WPQUADRATUM_PATH . 'includes/foursquare-helper/foursquare-helper.php');
 
 include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
+require_once (FOURSQUARE_HELPER_SRC);
+
+require_once(WPQUADRATUM_PATH . '/includes/wp-plugin-base/wp-plugin-base.php');
+require_once(WPMAPSTRACTION_SRC);
+require_once(WPQUADRATUM_WIDGET_SRC);
 require_once(WPQUADRATUM_SRC);
 
 ?>

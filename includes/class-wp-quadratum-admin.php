@@ -60,7 +60,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	function admin_notices () {
 		if (current_user_can ('manage_options')) {
 			$content = sprintf (__('You need to grant WP Quadratum access to your Foursquare account to show your checkins; you can go to the <a href="%s">WP Quadratum Settings And Options page</a> to do this now'),
-				admin_url ('options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php'));
+				admin_url ('options-general.php?page=wp-quadratum/includes/class-wp-quadratum-admin.php'));
 
 			echo '<div class="error">' . $content . '</div>';
 		}
@@ -129,7 +129,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	 */
 
 	function admin_settings_link ($links) {
-		$settings_link = '<a href="options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php">'
+		$settings_link = '<a href="options-general.php?page=wp-quadratum/includes/class-wp-quadratum-admin.php">'
 			. __('Settings')
 			. '</a>';
 		array_unshift ($links, $settings_link);
@@ -599,7 +599,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 	function admin_wrap ($tab, $title, $content) {
 		$action = admin_url ('options-general.php');
-		$action .= '?page=wp-quadratum/includes/wp-quadratum-admin.php&tab=' . $tab;
+		$action .= '?page=wp-quadratum/includes/class-wp-quadratum-admin.php&tab=' . $tab;
 	?>
 	    <div class="wrap">
 	        <h2><?php echo $title; ?></h2>
@@ -717,7 +717,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		
 		foreach (self::$tab_names as $tab => $name) {
 			$class = ($tab == $current) ? ' nav-tab-active' : '';
-			$content[] = "<a class='nav-tab$class' href='options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php&tab=$tab'>$name</a>";
+			$content[] = "<a class='nav-tab$class' href='options-general.php?page=wp-quadratum/includes/class-wp-quadratum-admin.php&tab=$tab'>$name</a>";
 		}	// end-foreach (...)
 		
 		$content[] = '</h2>';
