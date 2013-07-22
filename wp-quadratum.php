@@ -33,16 +33,8 @@ if (!defined ('WPMU_PLUGIN_DIR'))
 	define ('WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins');
 
 require_once (WPQUADRATUM_PATH . '/includes/wp-plugin-base/wp-plugin-base.php');
-//require_once (WPQUADRATUM_PATH . '/includes/wp-mxn-helper/wp-mxn-helper.php');
 require_once(WPQUADRATUM_PATH . '/includes/wp-mapstraction/wp-mapstraction.php');
 require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
-
-//define ('WPNAUTH_PLUGIN_HELPER', WP_PLUGIN_DIR . '/wp-nokia-auth/wp-nokia-auth-helper.php');
-//define ('WPNAUTH_PLUGIN_PATH', 'wp-nokia-auth/wp-nokia-auth.php');
-
-//if (file_exists (WPNAUTH_PLUGIN_HELPER)) {
-//	include_once (WPNAUTH_PLUGIN_HELPER);
-//}
 
 include_once (ABSPATH . 'wp-admin/includes/plugin.php');
 
@@ -68,26 +60,6 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 		}
 		return self::$instance;
 	}
-
-	/**
-	 * Helper function to check whether the WP Nokia Auth plugin is installed
-	 */
-	
-	/*static function is_wpna_installed () {
-		return file_exists (WPNAUTH_PLUGIN_HELPER);
-	}*/
-
-	/**
-	 * Helper function to check whether the WP Nokia Auth plugin is active
-	 */
-
-	/*static function is_wpna_active () {
-		return is_plugin_active (WPNAUTH_PLUGIN_PATH);
-	}*/
-
-	/**
-	 * Helper function to create the plugin's OAuth redirect URL
-	 */
 
 	static function make_redirect_url () {
 		return plugins_url ()
@@ -125,7 +97,7 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 		}
 
 		else {
-			// For wp_head and wp_enqueue_scripts hooks and for shortcode support, now see
+			// For wp_head and wp_head_scripts hooks and for shortcode support, now see
 			// includes/wp-quadratum-frontend.php
 
 			require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-frontend.php');
@@ -279,6 +251,43 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 		$options = get_options (self::OPTIONS);
 		$options[$key] = $value;
 		update_option (self::OPTIONS, $options);
+	}
+
+
+	/**
+	 * Helper function to determine if debugging is enabled in WordPress and/or
+	 * the plugin.
+	 */
+
+	static function is_debug() {
+		return ((defined('WP_DEBUG') && WP_DEBUG == true) ||
+				(defined('WPQUADRATUM_DEBUG') && WPQUADRATUM_DEBUG == true));
+	}
+
+	/**
+	 * Helper function to make a style filename load debug or minimized CSS depending
+	 * on the setting of WP_DEBUG and/or WPQUADRATUM_DEBUG.
+	 */
+	
+	static function make_css_path($stub) {
+		if (WP_Quadratum::is_debug()) {
+			return $stub . '.css';
+		}
+		
+		return $stub . '.min.css';
+	}
+
+	/**
+	 * Helper function to make a script filename load debug or minimized JS depending
+	 * on the setting of WP_DEBUG and/or WPQUADRATUM_DEBUG.
+	 */
+	
+	static function make_js_path($stub) {
+		if (WP_Quadratum::is_debug()) {
+			return $stub . '.js';
+		}
+		
+		return $stub . '.min.js';
 	}
 
 	/**

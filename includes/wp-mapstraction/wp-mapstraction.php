@@ -2,6 +2,8 @@
 
 define('WPMAPSTRACTION_URL', plugin_dir_url(__FILE__));
 define('WPMAPSTRACTION_PATH', plugin_dir_path(__FILE__));
+//define ('WPMAPSTRACTION_DEBUG', true);
+
 
 if (!class_exists('WP_Mapstraction')) {
 	class WP_Mapstraction extends WP_PluginBase_v1_1 {
@@ -142,14 +144,16 @@ if (!class_exists('WP_Mapstraction')) {
 			}
 
 			$handle = 'wp-mapstraction-css';
-			$src = WPMAPSTRACTION_URL . 'css/wp-mapstraction.css';
+			$src = WPMAPSTRACTION_URL . 'css/wp-mapstraction';
+			$src = WP_Mapstraction::make_css_path($src);
 			$deps = array();
 			$ver = false;
 			$media = 'all';
 			wp_enqueue_style($handle, $src, $deps, $ver, $media);
 
 			$handle = 'wp-mapstraction-js';
-			$src = WPMAPSTRACTION_URL . 'js/wp-mapstraction.js';
+			$src = WPMAPSTRACTION_URL . 'js/wp-mapstraction';
+			$src = WP_Mapstraction::make_js_path($src);
 			$deps = array('jquery');
 			
 			wp_enqueue_script($handle, $src, $deps, null, $footer);
@@ -270,6 +274,43 @@ if (!class_exists('WP_Mapstraction')) {
 			$params = array('key' => null);
 			return apply_filters('mapstraction-openmq-auth', $params);
 		}
+		
+		/**
+		 * Helper function to determine if debugging is enabled in WordPress and/or
+		 * the plugin.
+		 */
+
+		static function is_debug() {
+			return ((defined('WP_DEBUG') && WP_DEBUG == true) ||
+					(defined('WPMAPSTRACTION_DEBUG') && WPMAPSTRACTION_DEBUG == true));
+		}
+
+		/**
+		 * Helper function to make a style filename load debug or minimized CSS depending
+		 * on the setting of WP_DEBUG and/or WPMAPSTRACTION_DEBUG.
+		 */
+
+		static function make_css_path($stub) {
+			if (WP_Mapstraction::is_debug()) {
+				return $stub . '.css';
+			}
+
+			return $stub . '.min.css';
+		}
+
+		/**
+		 * Helper function to make a script filename load debug or minimized JS depending
+		 * on the setting of WP_DEBUG and/or WPMAPSTRACTION_DEBUG.
+		 */
+
+		static function make_js_path($stub) {
+			if (WP_Mapstraction::is_debug()) {
+				return $stub . '.js';
+			}
+
+			return $stub . '.min.js';
+		}
+		
 	}	// end-class WP_Mapstraction
 }	// end-if (!class_exists(...))
 ?>

@@ -170,7 +170,8 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	
 	public function wp_enqueue_scripts() {
 		$handle = 'wp-quadratum-frontend-script';
-		$src = WPQUADRATUM_URL . 'js/wp-quadratum-frontend.js';
+		$src = WPQUADRATUM_URL . 'js/wp-quadratum-frontend';
+		$src = WP_Quadratum::make_js_path($src);
 		$deps = array('mapstraction-js', 'wp-mapstraction-js');
 		$ver = false;
 		$footer = true;
