@@ -118,6 +118,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			
 			$handle = 'wp-quadratum-admin-css';
 			$src = WPQUADRATUM_URL . 'css/wp-quadratum-admin';
+			$src = WP_Quadratum::make_css_path($src);
 			wp_enqueue_style ($handle, $src);
 		}
 	}
