@@ -1,0 +1,8 @@
+.olTileImage {
+	max-width: none !important;
+	box-shadow: none !important;
+}
+
+.olControlAttribution {
+	bottom: 1% !important;
+}
