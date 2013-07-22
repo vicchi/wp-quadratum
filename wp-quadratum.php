@@ -33,20 +33,21 @@ if (!defined ('WPMU_PLUGIN_DIR'))
 	define ('WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins');
 
 require_once (WPQUADRATUM_PATH . '/includes/wp-plugin-base/wp-plugin-base.php');
-require_once (WPQUADRATUM_PATH . '/includes/wp-mxn-helper/wp-mxn-helper.php');
+//require_once (WPQUADRATUM_PATH . '/includes/wp-mxn-helper/wp-mxn-helper.php');
+require_once(WPQUADRATUM_PATH . '/includes/wp-mapstraction/wp-mapstraction.php');
 require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-widget.php');
 
-define ('WPNAUTH_PLUGIN_HELPER', WP_PLUGIN_DIR . '/wp-nokia-auth/wp-nokia-auth-helper.php');
-define ('WPNAUTH_PLUGIN_PATH', 'wp-nokia-auth/wp-nokia-auth.php');
+//define ('WPNAUTH_PLUGIN_HELPER', WP_PLUGIN_DIR . '/wp-nokia-auth/wp-nokia-auth-helper.php');
+//define ('WPNAUTH_PLUGIN_PATH', 'wp-nokia-auth/wp-nokia-auth.php');
 
-if (file_exists (WPNAUTH_PLUGIN_HELPER)) {
-	include_once (WPNAUTH_PLUGIN_HELPER);
-}
+//if (file_exists (WPNAUTH_PLUGIN_HELPER)) {
+//	include_once (WPNAUTH_PLUGIN_HELPER);
+//}
 
 include_once (ABSPATH . 'wp-admin/includes/plugin.php');
 
 class WP_Quadratum extends WP_PluginBase_v1_1 {
-	static $instance;
+	private static $instance;
 	
 	const OPTIONS = 'wp_quadratum_settings';
 	const VERSION = '121';
@@ -56,27 +57,33 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 * Class constructor
 	 */
 	
-	function __construct () {
-		self::$instance = $this;
-		
+	private function __construct () {
 		$this->hook ('plugins_loaded');
+	}
+	
+	public static function get_instance() {
+		if (!isset(self::$instance)) {
+			$class = __CLASS__;
+			self::$instance = new $class();
+		}
+		return self::$instance;
 	}
 
 	/**
 	 * Helper function to check whether the WP Nokia Auth plugin is installed
 	 */
 	
-	static function is_wpna_installed () {
+	/*static function is_wpna_installed () {
 		return file_exists (WPNAUTH_PLUGIN_HELPER);
-	}
+	}*/
 
 	/**
 	 * Helper function to check whether the WP Nokia Auth plugin is active
 	 */
 
-	static function is_wpna_active () {
+	/*static function is_wpna_active () {
 		return is_plugin_active (WPNAUTH_PLUGIN_PATH);
-	}
+	}*/
 
 	/**
 	 * Helper function to create the plugin's OAuth redirect URL
@@ -105,11 +112,13 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 */
 	 
 	function plugins_loaded () {
+		//error_log('wp-quadratum::plugins_loaded++');
 		register_activation_hook (__FILE__, array ($this, 'add_settings'));
 		
 		$this->hook ('init');
 		$this->hook ('widgets_init');
-		$this->hook ('wp_mxn_helper_providers', 'trim_mapstraction_providers');
+		$this->hook('wp_loaded');
+		//$this->hook ('wp_mxn_helper_providers', 'trim_mapstraction_providers');
 		
 		if (is_admin ()) {
 			// For admin_init, admin_menu, admin_print_styles, admin_print_scripts and
@@ -123,7 +132,60 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 			// includes/wp-quadratum-frontend.php
 
 			require_once (WPQUADRATUM_PATH . '/includes/wp-quadratum-frontend.php');
+			
+			$options = WP_Quadratum::get_option();
+			$map = $options['provider'];
+			$maps = WP_Mapstraction::get_instance()->get_supported_maps();
+			if ($maps[$map]['script']['auth']) {
+				//error_log('Map type ' . $map . ' needs authentication');
+				$hook = 'mapstraction-' . $map . '-auth';
+				$hook_func = $map . '_auth';
+				//error_log('Hooking ' . $hook . ' to function ' . $hook_func);
+				$this->hook($hook, $hook_func);
+			}
+			else {
+				//error_log('WP_Quadratum Map type ' . $map . ' does not need authentication');
+			}
+			WP_Mapstraction::get_instance()->set_footer(true);
+			WP_Mapstraction::get_instance()->add_map($map);
+			
 		}
+		//error_log('wp-quadratum::plugins_loaded--');
+	}
+	
+	function nokia_auth() {
+		//error_log('wp-quadratum::nokia_auth++');
+		$options = WP_Quadratum::get_option();
+		//error_log('app-id: ' . $options['nokia_app_id']);
+		//error_log('app-token: ' . $options['nokia_app_token']);
+		//error_log('wp-quadratum::nokia_auth--');
+		return (array('app-id' => $options['nokia_app_id'],
+			'auth-token' => $options['nokia_app_token']));
+	}
+	
+	function googlev3_auth() {
+		//error_log('WP_Quadratum googlev3_auth++');
+		$options = WP_Quadratum::get_option();
+		
+		//error_log('WP_Quadratum googlev3_auth--');
+		return (array('key' => $options['google_key'],
+			'sensor' => $options['google_sensor']));
+	}
+	
+	function microsoft7_auth() {
+		//error_log('WP_Quadratum microsoft7_auth++');
+		$options = WP_Quadratum::get_option();
+		
+		//error_log('WP_Quadratum microsoft7_auth--');
+		return (array('key' => $options['microsoft7_key']));
+	}
+	
+	function openmq_auth() {
+		//error_log('WP_Quadratum openmq_auth++');
+		$options = WP_Quadratum::get_option();
+		
+		//error_log('WP_Quadratum openmq_auth--');
+		return (array('key' => $options['openmq_key']));
 	}
 	
 	/**
@@ -132,7 +194,7 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 * supports
 	 */
 	
-	function trim_mapstraction_providers ($providers) {
+	/*function trim_mapstraction_providers ($providers) {
 		//$plugin_providers = array ('nokia', 'googlev3', 'leaflet', 'openmq', 'cloudmade', 'openlayers');
 		$plugin_providers = array ('nokia', 'googlev3', 'cloudmade', 'openlayers');
 		$trimmed_providers = array ();
@@ -143,15 +205,17 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 		}
 		
 		return $trimmed_providers;
-	}
+	}*/
 	
 	/**
 	 * "init" action hook; called to initialise the plugin
 	 */
 
 	function init () {
+		//error_log('wp_quadratum::init++');
 		$lang_dir = basename (dirname (__FILE__)) . DIRECTORY_SEPARATOR . 'lang';
 		load_plugin_textdomain ('wp-quadratum', false, $lang_dir);
+		//error_log('wp_quadratum::init--');
 	}
 	
 	/**
@@ -159,9 +223,15 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 */
 
 	function widgets_init () {
+		//error_log('wp_quadratum::widgets_init++');
+		//error_log('wp_quadratum::widgets_init--');
 		return register_widget ('WP_QuadratumWidget');
 	}
 	
+	function wp_loaded() {
+		//error_log('wp_quadratum::wp_loaded++');
+		//error_log('wp_quadratum::wp_loaded--');
+	}
 	/**
 	 * plugin activation / "activate_pluginname" action hook; called when the plugin is
 	 * first activated.
@@ -187,7 +257,9 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 					"nokia_app_token" => "",
 					"google_key" => "",
 					"google_sensor" => "false",
-					"cloudmade_key" => "",
+					//"cloudmade_key" => "",
+					'openmq_key' => '',
+					'bingv7_key' => ''
 					)
 				);
 
@@ -242,7 +314,7 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 	 * Helper function to get the current checkin from the Foursquare API
 	 */
 
-	static function get_foursquare_checkins () {
+	function get_foursquare_checkins () {
 		$client_id = WP_Quadratum::get_option ('client_id');
 		$client_secret = WP_Quadratum::get_option ('client_secret');
 		$oauth_token = WP_Quadratum::get_option ('oauth_token');
@@ -259,6 +331,6 @@ class WP_Quadratum extends WP_PluginBase_v1_1 {
 
 }	// end-class WP_Quadratum
 
-$__wp_quadratum_instance = new WP_Quadratum;
+WP_Quadratum::get_instance();
 
 ?>

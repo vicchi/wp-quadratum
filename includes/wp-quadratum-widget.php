@@ -27,6 +27,7 @@ class WP_QuadratumWidget extends WP_Widget {
 	 */
 	
 	function form($instance) {
+		//error_log('wp-quadratum-widget::form++');
 		$text_stub = '<label for="%s">%s</label><input type="text" id="%s" name="%s" value="%s" class="widefat" />';
 		$check_stub = '<input type="checkbox" id="%s" name="%s" %s /><label for="%s">%s</label>';
 		$content = '';
@@ -104,6 +105,7 @@ class WP_QuadratumWidget extends WP_Widget {
 			. '</p>';
 			
 		echo $content;
+		//error_log('wp-quadratum-widget::form--');
 	}
 	
 	/**
@@ -112,6 +114,7 @@ class WP_QuadratumWidget extends WP_Widget {
 	 */
 
 	function update($new_instance, $old_instance) {
+		//error_log('wp-quadratum-widget::update++');
 		$instance = $old_instance;
 		
 		$instance['title'] = strip_tags ($new_instance['title']);
@@ -123,6 +126,7 @@ class WP_QuadratumWidget extends WP_Widget {
 		}
 		$instance['id'] = (int)strip_tags($new_instance['id']);
 		
+		//error_log('wp-quadratum-widget::update--');
 		return $instance;
 	}
 	
@@ -131,57 +135,47 @@ class WP_QuadratumWidget extends WP_Widget {
 	 */
 
 	function widget($args, $instance) {
+		//error_log('wp-quadratum-widget::widget++');
 		extract ($args, EXTR_SKIP);
 
+		//error_log('++Instance Dump++');
+		//error_log(var_export($instance, true));
+		//error_log('--Instance Dump--');
+		//error_log('++Args Dump++');
+		//error_log(var_export($args, true));
+		//error_log('--Args Dump--');
+
+		$id = $this->get_widget_id($args);
+		
 		$content = $before_widget;
 		if ($instance['title']) {
 			$content .= $before_title
 				. $instance['title']
 				. $after_title;
 		}
-		$content .= $this->show_checkin_map ($instance);
+		$content .= $this->show_checkin_map ($instance, $id);
 		$content .= $after_widget;
 		
 		echo $content;
+		//error_log('wp-quadratum-widget::widget--');
 	}
 	
 	/**
 	 * Outputs the contents of the checkin map within the widget
 	 */
 	
-	function show_checkin_map($instance) {
+	function show_checkin_map($instance, $id) {
+		//error_log('wp-quadratum-widget::show_checkin_map++');
 		$content = array ();
 
-		$options = get_option ('wp_quadratum_settings');
+		//$options = get_option ('wp_quadratum_settings');
 
-		$json = WP_Quadratum::get_foursquare_checkins ();
-		$checkins = $json->response->checkins->items;
+		//$json = WP_Quadratum::get_instance()->get_foursquare_checkins ();
+		//$checkins = $json->response->checkins->items;
 
 		// TODO: Handle response caching
 
-		foreach ($checkins as $checkin) {
-			$app_id = NULL;
-			$app_token = NULL;
-			
-			if (WP_Quadratum::is_wpna_installed () && WP_Quadratum::is_wpna_active ()) {
-				$helper = new WPNokiaAuthHelper ();
-				
-				$tmp = $helper->get_id ();
-				if (!empty ($tmp)) {
-					$app_id = $tmp;
-				}
-				
-				$tmp = $helper->get_token ();
-				if (!empty ($tmp)) {
-					$app_token = $tmp;
-				}
-			}
-			
-			else {
-				$app_id = WP_Quadratum::get_option ('app_id');
-				$app_token = WP_Quadratum::get_option ('app_token');
-			}
-			
+		//foreach ($checkins as $checkin) {
 			$args = array ();
 			$args['width'] = $instance['width'];
 			$args['height'] = $instance['height'];
@@ -189,20 +183,38 @@ class WP_QuadratumWidget extends WP_Widget {
 			if (isset ($instance['private'])) {
 				$args['private'] = $instance['private'];
 			}
-			$args['app-id'] = $app_id;
-			$args['app-token'] = $app_token;
 			$args['container-class'] = 'wp-quadratum-widget-container';
-			$args['container-id'] = 'wp-quadratum-widget-container-' . $instance['id'];
+			//$args['container-id'] = 'wp-quadratum-widget-container-' . $instance['id'];
+			$args['container-id'] = 'wp-quadratum-widget-container-' . $id;
 			$args['map-class'] = 'wp-quadratum-widget-map';
-			$args['map-id'] = 'wp-quadratum-widget-map-' . $instance['id'];
+			//$args['map-id'] = 'wp-quadratum-widget-map-' . $instance['id'];
+			$args['map-id'] = 'wp-quadratum-widget-map-' . $id;
 			$args['venue-class'] = 'wp-quadratum-widget-venue';
-			$args['checkin'] = $checkin;
-			$content = WP_QuadratumFrontEnd::render_checkin_map ($args);
+			//$args['checkin'] = $checkin;
+			$content = WP_QuadratumFrontEnd::get_instance()->render_checkin_map ($args);
 			
-			break;	// Not really needed as we only return a single checkin item
-		}
+			//break;	// Not really needed as we only return a single checkin item
+		//}
 
+		//error_log('wp-quadratum-widget::show_checkin_map--');
 		return implode (PHP_EOL, $content);
+	}
+	
+	private function get_widget_id($args) {
+		$widget_id = $args['widget_id'];
+		$widget_name = null;
+		$widget_inst = null;
+		
+		$pos = strpos($widget_id, '-');
+		if ($pos !== false) {
+			//error_log('Well formed widget name');
+			$widget_name = substr($widget_id, 0, $pos);
+			//error_log('Widget name: ' . $widget_name);
+			$widget_inst = substr($widget_id, ++$pos);
+			//error_log('Widget instance: ' . $widget_inst);
+		}
+		
+		return $widget_inst;
 	}
 	
 }	// end class WP_QuadratumWidget
