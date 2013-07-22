@@ -3,6 +3,12 @@
 	box-shadow: none !important;
 }
 
+
+.wp-quadratum-shortcode-map img {
+	max-width: none !important;
+	box-shadow: none !important;
+}
+
 .olControlAttribution {
 	bottom: 1% !important;
 }
