@@ -203,6 +203,70 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				
 				case '120':
 				case '121':
+					// This is verging dangerously close to fugly but, as far as I can tell
+					// there's no API access to the settings for each widget, so ...
+					//
+					// The settings for all instances of a widget (active as well as inactive)
+					// are stored in a serialised array in the wp_options table called
+					// widget_'reference', where 'reference' is the lowercased version of
+					// the name passed to register_widget(). So ...
+					//
+					// The settings for all instances of our widget are stored in the
+					// serialised array widget_wp_quadratum_widget, which will look
+					// something like this ...
+					//
+					// array (
+					//	2 => 
+					//		array (
+					//			'title' => 'Last Foursquare Checkin',
+					//			'width' => 200,
+					//			'height' => 200,
+					//			'zoom' => 16,
+					//			'id' => 1,
+					//		),
+					//	3 => 
+					//		array ( .. ),
+					//	'_multiwidget' => 1,
+					// )
+					//
+					// We can't tell whether a widget is active or inactive from this array
+					// (but see get_widgets() in class-wp-quadratum-frontend.php for how to
+					// do that), but we don't need to here. All we need to do is skip non
+					// integer array indices (such as _multiwidget) and for every other
+					// meta array, prune the now obsolete 'id' setting and, if they don't
+					// exist, add in defaulted settings for the new 'width_units' and
+					// 'height_units' settings. Simple really.
+					
+					$widgets = get_option('widget_wp_quadratumwidget');
+					if (is_array($widgets)) {
+						$upgraded = array();
+						foreach ($widgets as $index => $meta) {
+							if (is_int($index)) {
+								if (is_array($meta)) {
+									if (isset($meta['id'])) {
+										unset($meta['id']);
+									}
+									if (!isset($meta['width_units'])) {
+										$meta['width_units'] = 'px';
+									}
+									if (!isset($meta['height_units'])) {
+										$meta['height_units'] = 'px';
+									}
+									$upgraded[$index] = $meta;
+								}
+								else {
+									$upgraded[$index] = $meta;
+								}
+							}
+							else {
+								$upgraded[$index] = $meta;
+							}
+						}	// end-foreach(...)
+						if (count($upgraded) > 0) {
+							update_option('widget_wp_quadratumwidget', $upgraded);
+						}
+					}
+
 					if (isset($options['cloudmade_key'])) {
 						unset($options['cloudmade_key']);
 					}
