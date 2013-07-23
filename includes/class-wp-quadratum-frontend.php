@@ -15,6 +15,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	
 	private $widgets = null;
 	private $checkin = null;
+	private $icon_url = null;
 	
 	/**
 	 * Class constructor
@@ -62,16 +63,19 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 		$venue = $this->checkin->venue;
 		$location = $venue->location;
-		$categories = $venue->categories;
+		//$categories = $venue->categories;
 		$venue_url = 'https://foursquare.com/v/' . $venue->id;
-		foreach ($categories as $category) {
-			$icon_url = $category->icon;
-			break;
-		}
-		if (is_object ($icon_url)) {
-			$icon_url = $icon_url->prefix . '32' . $icon_url->name;
-		}
 
+		//foreach ($categories as $category) {
+		//	$icon_url = $category->icon;
+		//	break;
+		//}
+		//if (is_object ($icon_url)) {
+		//	$icon_url = $icon_url->prefix . '32' . $icon_url->name;
+		//}
+
+		//error_log(var_export($location, true));
+		//error_log(var_export($venue, true));
 		$content = array ();
 
 		$style = 'style="width:' . $args['width'] . $args['width_units'] . '"';
@@ -88,6 +92,9 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		);
 		
 		$strapline = '<h5>Last seen at <a href="' . $venue_url . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $this->checkin->createdAt) . '</h5>';
+
+		apply_filters('wp_quadratum_checkin', $this->checkin);
+
 		$content[] = apply_filters ('wp_quadratum_strapline', $strapline, $params);
 		
 		$content[] = '</div>';
@@ -204,6 +211,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 				'checkin' => $checkins[0]
 			);
 			$this->checkin = $checkins[0];
+			$this->icon_url = $icon_url;
 			
 			wp_localize_script($handle, 'WPQuadratum', $args);
 		}
