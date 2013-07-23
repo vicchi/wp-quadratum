@@ -3,7 +3,7 @@ Contributors: vicchi
 Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.5.0
-Tested up to: 3.5.1
+Tested up to: 3.5.2
 Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,13 +18,14 @@ Setting and options include:
 
 1. Associate your WordPress powered site with your [Foursquare](https://foursquare.com/) account using [OAuth 2.0](http://oauth.net/2/), which keeps your personal information safe and secure.
 1. Choose which map provider you want your checkin shown on; you can choose from:
-	1. [Nokia Maps](http://api.maps.nokia.com/en/maps/intro.html)
-	1. [Google Maps](https://developers.google.com/maps/documentation/javascript/)
-	1. [OpenStreetMap](http://www.openstreetmap.org) from [CloudMade](http://cloudmade.com)
+	1. [HERE Maps](http://developer.here.com/javascript_api)
+	1. [Google Maps v3](https://developers.google.com/maps/documentation/javascript/)
+	1. [Bing Maps v7](http://msdn.microsoft.com/en-us/library/gg427610.aspx)
+	1. [OpenStreetMap](http://www.openstreetmap.org) from [Leaflet](http://leafletjs.com/)
 	1. [OpenStreetMap](http://www.openstreetmap.org) from [OpenLayers](http://openlayers.org)
-1. Add your maps API key(s) for your chosen map provider; Nokia Maps, Google Maps and CloudMade maps all require API keys.
-1. Add your authentication credentials for [Nokia Maps](http://www.developer.nokia.com/Develop/Maps/), either within the plugin's settings and options or via the [WP Nokia Auth](http://wordpress.org/extend/plugins/wp-nokia-auth/) plugin.
-1. Choose the width and height of the widget and map on the sidebar.
+	1. [OpenStreetMap]() from [MapQuest](http://developer.mapquest.com/web/products/open/sdk)
+1. Add your maps API key(s) for your chosen map provider; HERE, Google, Bing and MapQuest maps all require API keys.
+1. Choose the width and height of the widget and map on the sidebar. The width and height can be specified either as pixels (`px`) or as a percentage.
 1. Choose the zoom level of the map display.
 1. Choose whether to show private checkins on the map.
 
@@ -39,16 +40,13 @@ The current version of this plugin allows you to associate a single Foursquare a
 1. Activate the plugin. From the Dashboard, navigate to Plugins and click on the *"Activate"* link under the entry for WP Quadratum.
 1. Configure your Foursquare credentials; from the Dashboard, navigate to the *Settings / WP Quadratum* page or click on the *"Settings"* link from the Plugins page on the Dashboard.
 1. To display your Foursquare checkins, WP Quadratum needs to be authorised to access your Foursquare account information; this is a simple, safe and secure 3 step process. WP Quadratum never sees your account login information and cannot store any personally identifiable information.
-1. Step 1. Register this WordPress site as a Foursquare application on the [Foursquare OAuth Consumer Registration](https://foursquare.com/oauth/register) page. If you're not currently logged into your Foursquare account, you'll need to login with the Foursquare account whose checkins you want WP Quadratum to display. The *Application Name* is a label you want to use to identify this connection to your Foursquare account. The *Application Web Site* is the URL of your Wordpress site. The *Callback URL* will be provided for you and will be along the lines of http://www.yoursite.com/wp-content/plugins/wp-quadratum/includes/wp-quadratum-callback.php (this is just an example, *don't use this URL*). Once you have successfully registered your site, you'll be provided with two keys, the *Client ID* and the *Client Secret*.
-1. Step 2. Copy and paste the supplied *Client ID* and *Client Secret* into the respective WP Quadratum setting fields. Click on the *"Save Changes"* button to preserve them.
-1. Step 3. You should now be authorised and ready to go; click on the *Connect to Foursquare* button.
+	1. Register your WordPress site as a Foursquare application on the [Foursquare App Registration](https://foursquare.com/developers/register) page. If you're not currently logged into your Foursquare account, you'll need to login with the Foursquare account whose checkins you want WP Quadratum to display. The *Your app name* field is a label you want to use to identify this connection to your Foursquare account. The *Download / welcome page url* is the URL of your Wordpress site. The *Redirect URI* will be provided for you and will be along the lines of http://www.yoursite.com/wp-content/plugins/wp-quadratum/includes/wp-quadratum-callback.php (this is just an example, *don't use this URL*). *Push API Notifications* should be set to *Disable pushes to this app*. All other fields can be left at their default values. Once you have successfully registered your site, you'll be provided with two keys, the *Client ID* and the *Client Secret*.
+	1. Copy and paste the supplied *Client ID* and *Client Secret* into the respective WP Quadratum setting fields. Click on the *"Save Changes"* button to preserve them.
+	1. You should now be authorised and ready to go; click on the *Connect to Foursquare* button.
 1. Choose your mapping provider. From the *Maps* tab, select the map provider from the *Maps Provider* drop down.
-1. If your chosen mapping provider requires an API key or keys, enter them as requested. If you don't have an API key, each maps provider tab has a link to the provider's site where you can sign up and obtain your API key.
-1. If you have selected Nokia Maps as your map provider:
-	1. If you have the WP Nokia Auth plugin installed and configured, your Nokia Maps API keys will be shown in read-only form
-	1. If you don't have the WP Nokia Auth plugin installed and configured, you can enter your Nokia Maps API keys to give you, amongst other benefits, an increased per month transaction limit. Click on the *Save Changes* button to save your credentials.
+1. If your chosen mapping provider requires an API key or keys, enter them as requested. If you don't have an API key, each maps provider tab has a link to the provider's site where you can sign up and obtain your API key. Click on the *Save Changes* button to save your credentials.
 1. Add and configure a WP Quadratum Widget. From the Dashboard, navigate to *Appearance / Widgets* and drag the WP Quadratum Widget to your desired widget area.
-1. You can configure the widget's title, with widget's width and map height in px, the map zoom level and whether to show private checkins or not. Click on the *Save* button to preserve your changes.
+1. You can configure the widget's title, with widget's width and map height in `px` or as a percentage, the map zoom level and whether to show private checkins or not. Click on the *Save* button to preserve your changes.
 
 == Frequently Asked Questions ==
 
@@ -63,26 +61,6 @@ Absolutely. Go to the [WP Quadratum home page](http://www.vicchi.org/codeage/wp-
 = I have multiple authors on my site; can I have a widget for each author's Foursquare account? =
 
 In the current version, no. In the current version, you can link a single Foursquare account with your WordPress site (multi-site or network sites may work, assuming each site is for a single user but I haven't tested this). The plugin is currently designed to support a WordPress site which is used for a personal blog (in other words, exactly the way my site is set up). Future versions of the plugin *may* support this if people ask for this feature (assuming anyone apart from myself actually *uses* it!).
-
-= Nokia Maps? Really? =
-
-Yes. Really. At the time of writing (April 2012) 196 countries, 75M Places, 2.4M map changes a day. That sort of really. All available through a set of developer friendly APIs.
-
-= OK. Nokia Maps. I get it. But why register? =
-
-The Nokia Location APIs work if you don't register. But they work even better and you can do even more if you do register. Take transactional limits. Unregistered users of the Location APIs get 1 million transactions over a lifetime. 1 million sounds a lot but it soon mounts up. Registered users get 2 million transactions. *Per month*. [Plus a whole lot more](http://www.developer.nokia.com/Develop/Maps/Quota/).
-
-= Why are you so pro Nokia Maps? =
-
-A disclaimer is in order. I work for Nokia's Location & Commerce group, that produces Nokia Maps. I see what goes into the map and what gets displayed. I'm very pro Nokia Maps for just this reason.
-
-= What about other maps providers? Google or OpenStreetMap? =
-
-v1.1 of WP Quadratum uses [Mapstraction](http://mapstraction.com/) to support multiple maps providers. If Nokia Maps isn't your thing, you can choose from maps from Google or from OpenStreetMap via CloudMade or OpenLayers.
-
-= But what about Bing Maps, MapQuest or CloudMade's Leaflet? =
-
-Right now, all of these maps providers are supported by Mapstraction but they have issues when the sidebar's widget map is so small (200px by 200px by default). As and when these issues are resolved in Mapstraction, they'll be supported by a future release of the plugin.
 
 = Can I change the format of the strapline that appears under the checkin map? =
 
@@ -115,13 +93,27 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.2.0 (2012.11.06)
+The current version is 1.2.1 (2013.07.22)
+
+= 1.2.1 =
+* Released: 2013.07.22
+* Added: Support for HERE, Leaflet, MapQuest Open and Bing maps.
+* Added: All maps API JS now loads in the page footer to speed up overall page loading times.
+* Added: Support for a new filter, `wp_quadratum_checkin` giving full access to all the Foursquare checkin metadata that the Foursquare API returns.
+* Added: Support for specifying the height and width of the map as a percentage as well as in px.
+* Fixed: Update the admin 'Foursquare' tab to use the new app registration URL. Adjust the help text to reflect the new app registration layout on `foursquare.com/developers/register`.
+* Fixed: Updated Mapstraction support to pull JS code from `mapstraction.com` rather than `github.com/mapstraction/mxn` to work around new GitHub content serving policies.
+* Removed: Support for the CloudMade maps API; this has now been superseded by Leaflet maps.
+* Removed: Support for the Nokia maps API; this has now been superseded by HERE maps.
+* Removed: Support for authenticating Nokia maps via WP Nokia Auth; Nokia maps are now superseded by HERE maps.
+* Removed: Support for the `Widget ID` field from the plugin's widget; the plugin now uses the WordPress assigned widget instance.
+* Other: Transitioned to `WP_Mapstraction` from `WP_MXNHelper`.
 
 = 1.2 =
 * Released: 2012.11.06
 * Added: Support for the `wp_quadratum_strapline` filter.
-* Added: Enqueue non-minified versions of the plugin's CSS and JS files if WP_DEBUG or WPQUADRATUM_DEBUG are defined.
-* Other: Updated to latest versions of WP_PluginBase and WP_MXNHelper.
+* Added: Enqueue non-minified versions of the plugin's CSS and JS files if `WP_DEBUG` or `WPQUADRATUM_DEBUG` are defined.
+* Other: Updated to latest versions of `WP_PluginBase` and `WP_MXNHelper`.
 * Other: Moved all submodule classes/libraries from the plugin's root directory to /includes.
 
 = 1.1 =
@@ -143,6 +135,9 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+= 1.2.1 =
+Fix issue where the map did not load due to new GitHub content serving policy. Add support for Leaflet, Bing and MapQuest Open maps. Add new `wp_quadratum_checkin` filter.
+
 = 1.2 =
 Adds support for the `wp_quadratum_strapline` filter plus internal housekeeping and library upgrades.
 
@@ -182,7 +177,24 @@ The `zoom` attribute specifies the zoom level to be used when displaying the che
 
 == Filter Support And Usage ==
 
-WP Quadratum supports a single filter, which is described below.
+WP Quadratum supports two filters, which are described in more detail below. The plugin's filters allow you to:
+
+* change the descriptive text that appears immediately below the map when displayed via the plugin's widget or shortcode.
+* gain access to the checkin metadata that is returned from the Foursquare API
+
+= wp_quadratum_checkin =
+
+Allow a filter hook function to gain access to the checkin metadata that is returned from the Foursquare API and which is used to build the checkin map and strapline. It's important to note that the implementation of this filter isn't strictly a WordPress filter per se. The user defined hook function is passed only the checkin metadata. Any changes made to the metadata will not be reflected in the output of the plugin's or shortcode's map, nor will any return value from the hook function be honoured by the plugin. The filter will be called before the `wp_quadratum_strapline` filter, if used, allowing you to store the checkin contents and use them within the `wp_quadratum_strapline` filter hook.
+
+The contents of the checkin data this filter can access are a `Checkin Response` object, which is documented on the [Foursquare Developer Site](https://developer.foursquare.com/docs/responses/checkin).
+
+*Example:* Store the contents of the Foursquare checkin that the plugin will be to display the checkin map.
+
+`$last_checkin = null;
+add_filter('wp_quadratum_checkin', store_last_checkin, 10, 1);
+function store_last_checkin($checkin) {
+	$last_checkin = $checkin;
+}`
 
 = wp_quadratum_strapline =
 
