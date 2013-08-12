@@ -63,19 +63,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 		$venue = $this->checkin->venue;
 		$location = $venue->location;
-		//$categories = $venue->categories;
 		$venue_url = 'https://foursquare.com/v/' . $venue->id;
-
-		//foreach ($categories as $category) {
-		//	$icon_url = $category->icon;
-		//	break;
-		//}
-		//if (is_object ($icon_url)) {
-		//	$icon_url = $icon_url->prefix . '32' . $icon_url->name;
-		//}
-
-		//error_log(var_export($location, true));
-		//error_log(var_export($venue, true));
 		$content = array ();
 
 		$style = 'style="width:' . $args['width'] . $args['width_units'] . '"';
@@ -203,7 +191,6 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 				$icon_url = $icon_url->prefix . '32' . $icon_url->name;
 			}
 
-			
 			$args = array(
 				'provider' => $provider,
 				'icon-url' => $icon_url,
