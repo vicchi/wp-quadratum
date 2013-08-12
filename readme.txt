@@ -77,19 +77,20 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 1. Settings and Options: Foursquare Tab; Client ID and Client Secret entered
 1. Settings and Options: Foursquare Tab; Client ID and Client Secret saved
+1. Foursquare Authentication; not logged in
+1. Foursquare Authentication; logged in
 1. Settings and Options: Foursquare Tab; Successfully authenticated with Foursquare
-1. Settings and Options: Maps Tab; Nokia Maps without WP Nokia Auth installed and active
-1. Settings and Options: Maps Tab; Nokia Maps with WP Nokia Auth installed and active
-1. Settings and Options: Maps Tab; CloudMade Maps
-1. Settings and Options: Maps Tab; Google Maps
-1. Settings and Options: Maps Tab; OpenLayers Maps
+1. Settings and Options: Maps Tab; HERE Maps configuration
+1. Settings and Options: Maps Tab; Google Maps v3 configuration
+1. Settings and Options: Maps Tab; Leaflet Maps configuration
+1. Settings and Options: Maps Tab; Bing Maps v7 configuration
+1. Settings and Options: Maps Tab; OpenLayers Maps configuration
+1. Settings and Options: Maps Tab; MapQuest Open Maps configuration
 1. Settings and Options: Defaults Tab
 1. Settings and Options: Colophon Tab
-1. Settings and Options: Widget settings
-1. Sample Widget: with Nokia Maps
-1. Sample Widget: with CloudMade Maps
-1. Sample Widget: with Google Maps
-1. Sample Widget: with OpenLayers Maps
+1. Appearance: Widgets; Sample widget settings
+1. Sample Widget: Google v3, HERE and Leaflet maps
+1. Sample Widget: Bing v7, OpenLayers and MapQuest Open maps
 
 == Changelog ==
 
