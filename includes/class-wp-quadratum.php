@@ -28,7 +28,7 @@ if (!class_exists('WP_Quadratum')) {
 			return plugins_url ()
 				. '/'
 				. dirname (plugin_basename (__FILE__))
-				. '/includes/wp-quadratum-callback.php';
+				. '/wp-quadratum-callback.php';
 		}
 
 		/**
@@ -257,7 +257,7 @@ if (!class_exists('WP_Quadratum')) {
 		 * Helper function to get the current checkin from the Foursquare API
 		 */
 
-		function get_foursquare_checkins () {
+		static function get_foursquare_checkins () {
 			$client_id = WP_Quadratum::get_option ('client_id');
 			$client_secret = WP_Quadratum::get_option ('client_secret');
 			$oauth_token = WP_Quadratum::get_option ('oauth_token');

@@ -25,7 +25,7 @@ if (array_key_exists ('code', $_GET) && !function_exists ('site_url')) {
 	update_option ('wp_quadratum_settings', $wp_quadratum_settings);
 
 	$redirect_url = site_url ()
-		. '/wp-admin/options-general.php?page=wp-quadratum/includes/wp-quadratum-admin.php';
+		. '/wp-admin/options-general.php?page=wp-quadratum/includes/class-wp-quadratum-admin.php';
 
 	wp_redirect ($redirect_url);
 }
