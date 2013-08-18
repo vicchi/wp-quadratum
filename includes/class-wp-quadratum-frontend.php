@@ -60,38 +60,40 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		//	)
 
 		$provider = WP_Quadratum::get_option ('provider');
-
-		$venue = $this->checkin->venue;
-		$location = $venue->location;
-		$venue_url = 'https://foursquare.com/v/' . $venue->id;
 		$content = array ();
 
-		$style = 'style="width:' . $args['width'] . $args['width_units'] . '"';
-		$content[] = '<div id="' . $args['container-id'] . '" class="' . $args['container-class'] .'" ' . $style . '>';
+		if ($this->checkin) {
+			$venue = $this->checkin->venue;
+			$location = $venue->location;
+			$venue_url = 'https://foursquare.com/v/' . $venue->id;
 
-		$style = 'style="max-width:none; position:relative; width:' . $args['width'] . $args['width_units'] . '; height:' . $args['height'] . $args['height_units']. ';"';
-		$content[] = '<div id="' . $args['map-id'] . '" class="' . $args['map-class'] . '" ' . $style . '></div>';
-		$content[] = '<div class="' . $args['venue-class'] . '">';
-		
-		$params = array (
-			'venue-url' => $venue_url,
-			'venue-name' => $venue->name,
-			'checked-in-at' => $this->checkin->createdAt
-		);
-		
-		$strapline = '<h5>Last seen at <a href="' . $venue_url . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $this->checkin->createdAt) . '</h5>';
+			$style = 'style="width:' . $args['width'] . $args['width_units'] . '"';
+			$content[] = '<div id="' . $args['container-id'] . '" class="' . $args['container-class'] .'" ' . $style . '>';
 
-		apply_filters('wp_quadratum_checkin', $this->checkin);
+			$style = 'style="max-width:none; position:relative; width:' . $args['width'] . $args['width_units'] . '; height:' . $args['height'] . $args['height_units']. ';"';
+			$content[] = '<div id="' . $args['map-id'] . '" class="' . $args['map-class'] . '" ' . $style . '></div>';
+			$content[] = '<div class="' . $args['venue-class'] . '">';
 
-		$content[] = apply_filters ('wp_quadratum_strapline', $strapline, $params);
-		
-		$content[] = '</div>';
-		$content[] = '</div>';
-		
-		if ($shortcode) {
-			$content[] = '<form id="' . $args['form-id'] .'">';
-			$content[] = '<input type="hidden" id="' . $args['zoom-id'] . '" value="' . $args['zoom'] . '"/>';
-			$content[] = '</form>';
+			$params = array (
+				'venue-url' => $venue_url,
+				'venue-name' => $venue->name,
+				'checked-in-at' => $this->checkin->createdAt
+			);
+
+			$strapline = '<h5>Last seen at <a href="' . $venue_url . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $this->checkin->createdAt) . '</h5>';
+
+			apply_filters('wp_quadratum_checkin', $this->checkin);
+
+			$content[] = apply_filters ('wp_quadratum_strapline', $strapline, $params);
+
+			$content[] = '</div>';
+			$content[] = '</div>';
+
+			if ($shortcode) {
+				$content[] = '<form id="' . $args['form-id'] .'">';
+				$content[] = '<input type="hidden" id="' . $args['zoom-id'] . '" value="' . $args['zoom'] . '"/>';
+				$content[] = '</form>';
+			}
 		}
 
 		return $content;
@@ -111,6 +113,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	 */
 
 	function shortcode ($atts, $content=null) {
+		
 		// TODO: handle self-closing and enclosing shortcode forms properly
 		// TODO: this function is fugly; need to break out the checkin acquisition
 		// and map generation code into a function/functions that can be called by
@@ -173,7 +176,15 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 		wp_enqueue_script($handle, $src, $deps, $ver, $footer);
 
-		if (count($this->widgets) !== 0) {
+		// Code Health Warning
+		// This is fugly ... if the current page is trying to display a checkin map via
+		// the plugin's shortcode *only*, then we may well have no widgets defined and
+		// thus, by the time the shortcode is processed (within the Loop), there will be
+		// no checkin data present, so for now, we'll have to query Foursquare for each page
+		// load.
+		//
+
+		//if (count($this->widgets) !== 0) {
 			$json = WP_Quadratum::get_foursquare_checkins ();
 			$checkins = $json->response->checkins->items;
 			
@@ -201,7 +212,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			$this->icon_url = $icon_url;
 			
 			wp_localize_script($handle, 'WPQuadratum', $args);
-		}
+		//}
 	}
 	
 	private function get_widgets() {
