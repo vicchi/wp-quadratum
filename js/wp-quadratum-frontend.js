@@ -6,8 +6,10 @@
 			$.each(WPQuadratum.widgets, function(index, widget) {
 				var map_div = 'wp-quadratum-widget-map-' + widget['instance'];
 				var map_id = document.getElementById(map_div);
-				
-				render_plugin_map(map_id, widget['options']['zoom']);
+
+				if (map_id !== null) {
+					render_plugin_map(map_id, widget['options']['zoom']);
+				}
 			});
 		}
 		
@@ -37,6 +39,5 @@
 		marker.addData(opts);
 		map.addMarker(marker);
 	}
-	
 })(jQuery);
 
