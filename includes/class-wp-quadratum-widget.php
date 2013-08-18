@@ -30,9 +30,7 @@ class WP_QuadratumWidget extends WP_Widget {
 				'width_units' => 'px',
 				'height' => 200,
 				'height_units' => 'px',
-				'zoom' => 16,
-				'private' => 0,
-				'id' => 1
+				'zoom' => 16
 				)
 			);
 
@@ -97,16 +95,6 @@ class WP_QuadratumWidget extends WP_Widget {
 				)
 			. '</p>';
 
-		$content[] = '<p>'
-			. sprintf ($check_stub,
-				$this->get_field_id ('private'),
-				$this->get_field_name ('private'),
-				checked ($instance['private'], true, false),
-				$this->get_field_id ('private'),
-				__('Show Private Checkins')
-				)
-			. '</p>';
-
 		echo implode('', $content);
 	}
 	
@@ -124,9 +112,6 @@ class WP_QuadratumWidget extends WP_Widget {
 		$instance['height'] = (int)strip_tags ($new_instance['height']);
 		$instance['height_units'] = strip_tags($new_instance['height_units']);
 		$instance['zoom'] = (int)strip_tags ($new_instance['zoom']);
-		if (isset ($instance['private'])) {
-			$instance['private'] = (int)$new_instance['private'];
-		}
 		
 		return $instance;
 	}
@@ -164,9 +149,6 @@ class WP_QuadratumWidget extends WP_Widget {
 		$args['height'] = $instance['height'];
 		$args['height_units'] = $instance['height_units'];
 		$args['zoom'] = $instance['zoom'];
-		if (isset ($instance['private'])) {
-			$args['private'] = $instance['private'];
-		}
 		$args['container-class'] = 'wp-quadratum-widget-container';
 		$args['container-id'] = 'wp-quadratum-widget-container-' . $id;
 		$args['map-class'] = 'wp-quadratum-widget-map';

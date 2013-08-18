@@ -50,7 +50,6 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		//		'width' =>
 		//		'height' =>
 		//		'zoom' =>
-		//		'private' =>
 		//		'container-class' =>
 		//		'container-id' =>
 		//		'map-class' =>
@@ -134,8 +133,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			'width_units' => 'px',
 			'height' => 300,
 			'height_units' => 'px',
-			'zoom' => 16,
-			'private' => false
+			'zoom' => 16
 		), $atts));
 
 		if (strpos($width_units, 'px') === false && strpos($width_units, '%') === false) {
@@ -151,7 +149,6 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		$args['height'] = $height;
 		$args['height_units'] = $height_units;
 		$args['zoom'] = $zoom;
-		$args['private'] = $private;
 		$args['container-class'] = 'wp-quadratum-shortcode-container';
 		$args['container-id'] = $container_id;
 		$args['map-class'] = 'wp-quadratum-shortcode-map';

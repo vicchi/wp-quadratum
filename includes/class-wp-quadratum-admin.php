@@ -246,6 +246,9 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 									if (isset($meta['id'])) {
 										unset($meta['id']);
 									}
+									if (isset($meta['private'])) {
+										unset($meta['private']);
+									}
 									if (!isset($meta['width_units'])) {
 										$meta['width_units'] = 'px';
 									}
