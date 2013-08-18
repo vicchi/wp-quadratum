@@ -5,8 +5,8 @@ if (!class_exists('WP_Quadratum')) {
 		private static $instance;
 	
 		const OPTIONS = 'wp_quadratum_settings';
-		const VERSION = '121';
-		const DISPLAY_VERSION = 'v1.2.1';
+		const VERSION = '130';
+		const DISPLAY_VERSION = 'v1.3.0';
 	
 		/**
 		 * Class constructor

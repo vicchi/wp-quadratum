@@ -4,7 +4,7 @@ Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.6.0
 Tested up to: 3.6.0
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,6 @@ Setting and options include:
 1. Add your maps API key(s) for your chosen map provider; HERE, Google, Bing and MapQuest maps all require API keys.
 1. Choose the width and height of the widget and map on the sidebar. The width and height can be specified either as pixels (`px`) or as a percentage.
 1. Choose the zoom level of the map display.
-1. Choose whether to show private checkins on the map.
 
 The <em>strapline</em> text containing the venue name, venue URL and timestamp of your last Foursquare checkin can be customised via the plugin's filters. See the *Filter Support And Usage* section for more information.
 
@@ -46,7 +45,7 @@ The current version of this plugin allows you to associate a single Foursquare a
 1. Choose your mapping provider. From the *Maps* tab, select the map provider from the *Maps Provider* drop down.
 1. If your chosen mapping provider requires an API key or keys, enter them as requested. If you don't have an API key, each maps provider tab has a link to the provider's site where you can sign up and obtain your API key. Click on the *Save Changes* button to save your credentials.
 1. Add and configure a WP Quadratum Widget. From the Dashboard, navigate to *Appearance / Widgets* and drag the WP Quadratum Widget to your desired widget area.
-1. You can configure the widget's title, with widget's width and map height in `px` or as a percentage, the map zoom level and whether to show private checkins or not. Click on the *Save* button to preserve your changes.
+1. You can configure the widget's title, with widget's width and map height in `px` or as a percentage and the map zoom level. Click on the *Save* button to preserve your changes.
 
 == Frequently Asked Questions ==
 
@@ -94,9 +93,9 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.2.1 (2013.07.22)
+The current version is 1.3.0 (2013.07.22)
 
-= 1.2.1 =
+= 1.3.0 =
 * Released: 2013.07.22
 * Added: Support for HERE, Leaflet, MapQuest Open and Bing maps.
 * Added: All maps API JS now loads in the page footer to speed up overall page loading times.
@@ -136,7 +135,7 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
-= 1.2.1 =
+= 1.3.0 =
 Fix issue where the map did not load due to new GitHub content serving policy. Add support for Leaflet, Bing and MapQuest Open maps. Add new `wp_quadratum_checkin` filter.
 
 = 1.2 =

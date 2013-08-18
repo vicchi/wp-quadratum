@@ -202,7 +202,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$this->admin_upgrade_option ($options, 'cloudmade_key', '');
 				
 				case '120':
-				case '121':
+				case '130':
 					// This is verging dangerously close to fugly but, as far as I can tell
 					// there's no API access to the settings for each widget, so ...
 					//
