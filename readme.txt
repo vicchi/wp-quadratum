@@ -103,6 +103,7 @@ The current version is 1.3.0 (2013.07.22)
 * Added: Support for specifying the height and width of the map as a percentage as well as in px.
 * Fixed: Update the admin 'Foursquare' tab to use the new app registration URL. Adjust the help text to reflect the new app registration layout on `foursquare.com/developers/register`.
 * Fixed: Updated Mapstraction support to pull JS code from `mapstraction.com` rather than `github.com/mapstraction/mxn` to work around new GitHub content serving policies.
+* Removed: Support for filtering out private checkins; the Foursquare API no longer supports this.
 * Removed: Support for the CloudMade maps API; this has now been superseded by Leaflet maps.
 * Removed: Support for the Nokia maps API; this has now been superseded by HERE maps.
 * Removed: Support for authenticating Nokia maps via WP Nokia Auth; Nokia maps are now superseded by HERE maps.
@@ -160,16 +161,26 @@ WP Quadratum supports a single shortcode, `[wp_quadratum]`. Adding this shortcod
 The shortcode also supports multiple *attributes* which allow you to customise the way in which the shortcode is expanded into the checkin map:
 
 * the `width` attribute
+* the `width_units` attribute
 * the `height` attribute
+* the `height_units` attribute
 * the `zoom` attribute
 
 = The "width" Attribute =
 
-The `width` attribute, in conjunction with the `height` attribute specifies the width, in pixels, of the map to be inserted into a post or page. If omitted, the map width defaults to a value of `300px`.
+The `width` attribute, in conjunction with the `height` attribute specifies the width of the map to be inserted into a post or page. If omitted, the map width defaults to a value of `300`.
+
+= The "width_units" Attribute =
+
+The `width_units` attribute, specifies how the value specified in the `width` attribute should be interpreted. Valid values for this attribute as `px` and `%`, denoting that the `width` attribute should be interpreted in pixels or as a percentage respectively. If omitted, this attribute defaults to a value of `px`.
 
 = The "height" Attribute =
 
-The `height` attribute, in conjunction with the `width` attribute specifies the height, in pixels, of the map to be inserted into a post or page. If omitted, the map height defaults to a value of `300px`.
+The `height` attribute, in conjunction with the `width` attribute specifies the height of the map to be inserted into a post or page. If omitted, the map height defaults to a value of `300`.
+
+= The "height_units" Attribute =
+
+The `height_units` attribute, specifies how the value specified in the `height` attribute should be interpreted. Valid values for this attribute as `px` and `%`, denoting that the `height` attribute should be interpreted in pixels or as a percentage respectively. If omitted, this attribute defaults to a value of `px`.
 
 = The "zoom" Attribute =
 
@@ -202,14 +213,14 @@ Applied to the strapline that is displayed via the plugin's widget or shortcode.
 
 *Example:* Change the date and time formatting in the strapline
 
-`add_filter ('wp_quadratum_strapline', 'format_strapline', 10, 2);
-function format_strapline ($content, $params) {
+`add_filter('wp_quadratum_strapline', 'format_strapline', 10, 2);
+function format_strapline($content, $params) {
 	// $params = array (
 	//		'venue-url' => '4Sq venue url for checkin',
 	//		'venue-name' => 'checkin venue name',
 	//		'checked-in-at' => 'timestamp of checkin'
 	//	);
 	
-	$strapline = '<h5>Last seen at <a href="' . $params['venue-url'] . '" target="_blank">' . $params['venue-name'] . '</a> on ' . date ('l jS \of F Y h:i:s A', $params['checked-in-at']) . '</h5>';
+	$strapline = '<h5>Last seen at <a href="' . $params['venue-url'] . '" target="_blank">' . $params['venue-name'] . '</a> on ' . date('l jS \of F Y h:i:s A', $params['checked-in-at']) . '</h5>';
 	return $strapline;
 }`
