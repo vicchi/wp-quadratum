@@ -93,10 +93,10 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.3.0 (2013.07.22)
+The current version is 1.3.0 (2013.08.22)
 
 = 1.3.0 =
-* Released: 2013.07.22
+* Released: 2013.08.22
 * Added: Support for HERE, Leaflet, MapQuest Open and Bing maps.
 * Added: All maps API JS now loads in the page footer to speed up overall page loading times.
 * Added: Support for a new filter, `wp_quadratum_checkin` giving full access to all the Foursquare checkin metadata that the Foursquare API returns.
