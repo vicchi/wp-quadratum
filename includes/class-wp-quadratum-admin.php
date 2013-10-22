@@ -160,8 +160,8 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		$options = null;
 		$upgrade_settings = false;
 		$current_plugin_version = NULL;
-
 		$options = WP_Quadratum::get_option ();
+
 		if (is_array ($options) &&
 				!empty ($options['version']) &&
 				$options['version'] == WP_Quadratum::VERSION) {
@@ -276,7 +276,14 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 					$this->admin_upgrade_option($options, 'openmq_key', '');
 					$this->admin_upgrade_option($options, 'microsoft7_key', '');
-				
+
+				case '131':
+					$cache = array();
+					$cache['timestamp'] = time();
+					$cache['checkin'] = null;
+					$cache['locality'] = null;
+					update_option(WP_Quadratum::CACHE, $cache);
+
 					$options['version'] = WP_Quadratum::VERSION;
 					$upgrade_settings = true;
 

@@ -186,8 +186,22 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		//
 
 		//if (count($this->widgets) !== 0) {
+		$have_checkin = false;
+		$cached_checkin = false;
+		
 		$json = WP_Quadratum::get_foursquare_checkins ();
-		if ($this->validate_checkin($json)) {
+		if (!$this->validate_checkin($json)) {
+			$json = WP_Quadratum::get_cache('checkin');
+			if ($this->validate_checkin($json)) {
+				$have_checkin = true;
+				$cached_checkin = true;
+			}
+		}
+		else {
+			$have_checkin = true;
+		}
+		
+		if ($have_checkin) {
 			$checkins = $json->response->checkins->items;
 
 			$provider = WP_Quadratum::get_option ('provider');
@@ -214,6 +228,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			$this->icon_url = $icon_url;
 
 			wp_localize_script($handle, 'WPQuadratum', $args);
+			
+			if (!$cached_checkin) {
+				WP_Quadratum::set_cache('checkin', $json);
+			}
 		}
 		//}
 	}

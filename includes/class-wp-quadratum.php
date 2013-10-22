@@ -5,8 +5,9 @@ if (!class_exists('WP_Quadratum')) {
 		private static $instance;
 	
 		const OPTIONS = 'wp_quadratum_settings';
-		const VERSION = '130';
-		const DISPLAY_VERSION = 'v1.3.0';
+		const CACHE = 'wp_quadratum_cache';
+		const VERSION = '131';
+		const DISPLAY_VERSION = 'v1.3.1';
 	
 		/**
 		 * Class constructor
@@ -171,6 +172,16 @@ if (!class_exists('WP_Quadratum')) {
 
 				update_option (self::OPTIONS, $settings);
 			}
+			
+			$cache = WP_Quadratum::get_cache();
+			if (!is_array($cache)) {
+				$cache = array(
+					'timestamp' => time(),
+					'checkin' => null,
+					'locality' => null
+				);
+				update_option(self::CACHE, $cache);
+			}
 		}
 	
 		/**
@@ -202,6 +213,25 @@ if (!class_exists('WP_Quadratum')) {
 				return $options;
 			}
 		}
+		
+		static function get_cache() {
+			$num_args = func_num_args();
+			$cache = get_option(self::CACHE);
+			
+			if ($num_args > 0) {
+				$args = func_get_args();
+				$key = $args[0];
+				$value = '';
+				if (isset($cache[$key])) {
+					$value = $cache[$key];
+				}
+				return $value;
+			}
+			
+			else {
+				return $cache;
+			}
+		}
 
 		/**
 		 * Adds/updates a settings/option key and value in the back-end database.
@@ -210,12 +240,18 @@ if (!class_exists('WP_Quadratum')) {
 		 * @param string value Value to be associated with the specified settings/option key
 		 */
 
-		static function set_option ($key, $value) {
-			$options = get_options (self::OPTIONS);
+		static function set_option($key, $value) {
+			$options = get_option(self::OPTIONS);
 			$options[$key] = $value;
-			update_option (self::OPTIONS, $options);
+			update_option(self::OPTIONS, $options);
 		}
 
+		static function set_cache($key, $value) {
+			$cache = get_option(self::CACHE);
+			$cache['timestamp'] = time();
+			$cache[$key] = $value;
+			update_option(self::CACHE, $cache);
+		}
 
 		/**
 		 * Helper function to determine if debugging is enabled in WordPress and/or
