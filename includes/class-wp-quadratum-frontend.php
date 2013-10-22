@@ -95,6 +95,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			}
 		}
 
+		else {
+			$content[] = '<h5>Something went wrong; the Foursquare API might be down?</h5>';
+		}
+		
 		return $content;
 	}
 
@@ -182,9 +186,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		//
 
 		//if (count($this->widgets) !== 0) {
-			$json = WP_Quadratum::get_foursquare_checkins ();
+		$json = WP_Quadratum::get_foursquare_checkins ();
+		if ($this->validate_checkin($json)) {
 			$checkins = $json->response->checkins->items;
-			
+
 			$provider = WP_Quadratum::get_option ('provider');
 
 			$venue = $checkins[0]->venue;
@@ -207,11 +212,24 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			);
 			$this->checkin = $checkins[0];
 			$this->icon_url = $icon_url;
-			
+
 			wp_localize_script($handle, 'WPQuadratum', $args);
+		}
 		//}
 	}
 	
+	private function validate_checkin($json) {
+		if ($json === false || $json === null) {
+			return false;
+		}
+		
+		if (!isset($json->response) || !isset($json->response->checkins) || !isset($json->response->checkins->items)) {
+			return false;
+		}
+		
+		return true;
+	}
+
 	private function get_widgets() {
 		$this->widgets = array();
 		

@@ -268,8 +268,13 @@ if (!class_exists('WP_Quadratum')) {
 			$fsq = new FoursquareHelper_v1_0 ($client_id, $client_secret, $redirect_url);
 			$fsq->set_access_token ($oauth_token);
 			$rsp = $fsq->get_private ($endpoint, $params);
-			$json = json_decode ($rsp);
-			return $json;
+
+			if ($rsp !== false) {
+				$json = json_decode($rsp);
+				return $json;
+			}
+			
+			return $rsp;
 		}
 
 	}	// end-class WP_Quadratum

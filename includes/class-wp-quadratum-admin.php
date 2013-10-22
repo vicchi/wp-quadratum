@@ -600,7 +600,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 							$reset_options = true;
 							$this->admin_reset_plugin ();
 							$update_msg = __('All', 'wp-quadratum');
-							$update_action = __('Reset To Default Values', 'wp-quadratum');
+							$action_msg = __('Reset To Default Values', 'wp-quadratum');
 						}
 						break;
 						
