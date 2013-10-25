@@ -50,3 +50,8 @@
 	-webkit-border-radius: 3px;
 	background: #FCB2B5 url(../images/error.png) no-repeat 5px center;
 }
+
+#wp-quadratum-client-id, #wp-quadratum-client-secret,
+#wp-quadratum-factual-oauth-key, #wp-quadratum-factual-oauth-secret {
+	width: 450px;
+}

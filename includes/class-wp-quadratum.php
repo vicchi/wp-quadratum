@@ -166,7 +166,11 @@ if (!class_exists('WP_Quadratum')) {
 						"google_sensor" => "false",
 						//"cloudmade_key" => "",
 						'openmq_key' => '',
-						'bingv7_key' => ''
+						'bingv7_key' => '',
+						'enable_map_sc' => 'on',
+						'enable_locality_sc' => '',
+						'factual_oauth_key' => '',
+						'factual_oauth_secret' => ''
 						)
 					);
 

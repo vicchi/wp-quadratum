@@ -15,6 +15,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	
 	private $widgets = null;
 	private $checkin = null;
+	private $cache = null;
 	private $icon_url = null;
 	
 	/**
@@ -22,8 +23,13 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	 */
 	
 	private function __construct () {
-		add_shortcode ('wp_quadratum', array ($this, 'shortcode'));
+		add_shortcode('wp_quadratum', array($this, 'map_shortcode'));
+		add_shortcode('wp_quadratum_map', array($this, 'map_shortcode'));
+		add_shortcode('wpq_map', array($this, 'map_shortcode'));
 
+		add_shortcode('wp_quadratum_locality', array($this, 'locality_shortcode'));
+		add_shortcode('wpq_locality', array($this, 'locality_shortcode'));
+		
 		$this->hook('wp_loaded');
 		$this->hook('wp_enqueue_scripts');
 	}
@@ -79,7 +85,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 				'checked-in-at' => $this->checkin->createdAt
 			);
 
-			$strapline = '<h5>Last seen at <a href="' . $venue_url . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $this->checkin->createdAt) . '</h5>';
+			$strapline = '<h5>Last seen at <a href="' . $venue_url . '?ref=' . WP_Quadratum::get_option('client_id') . '" target="_blank">' . $venue->name . '</a> on ' . date ("d M Y G:i T", $this->checkin->createdAt) . '</h5>';
 
 			apply_filters('wp_quadratum_checkin', $this->checkin);
 
@@ -103,8 +109,8 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	}
 
 	/**
-	 * Shortcode handler for the [wp_quadratum] shortcode; expands the shortcode to the
-	 * checkin map according to the current set of plugin settings/options.
+	 * Shortcode handler for the [wp_quadratum] and [wpq_map] shortcodes; expands the
+	 * shortcode to the checkin map according to the current set of plugin settings/options.
 	 *
 	 * @param array atts Array containing the optional shortcode attributes specified by
 	 * the current instance of the shortcode.
@@ -115,56 +121,183 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	 * of settings/options permit this.
 	 */
 
-	function shortcode ($atts, $content=null) {
+	function map_shortcode ($atts, $content=null) {
+		if ($options['enable_map_sc'] === 'on') {
+			// TODO: handle self-closing and enclosing shortcode forms properly
+			// TODO: this function is fugly; need to break out the checkin acquisition
+			// and map generation code into a function/functions that can be called by
+			// both the shortcode, the widget and the the_content filter (when I write it)
+			// TODO: check and handle error responses from the 4sq API
+			// TODO: handle 4sq API response caching
 		
-		// TODO: handle self-closing and enclosing shortcode forms properly
-		// TODO: this function is fugly; need to break out the checkin acquisition
-		// and map generation code into a function/functions that can be called by
-		// both the shortcode, the widget and the the_content filter (when I write it)
-		// TODO: check and handle error responses from the 4sq API
-		// TODO: handle 4sq API response caching
-		
-		static $instance = 0;
+			static $instance = 0;
 
-		$container_id = 'wp-quadratum-shortcode-container-' . $instance;
-		$map_id = 'wp-quadratum-shortcode-map-' . $instance;
-		$form_id = 'wp-quadratum-shortcode-form-' . $instance;
-		$zoom_id = 'wp-quadratum-shortcode-zoom-' . $instance;
-		$content = array ();
+			$container_id = 'wp-quadratum-shortcode-container-' . $instance;
+			$map_id = 'wp-quadratum-shortcode-map-' . $instance;
+			$form_id = 'wp-quadratum-shortcode-form-' . $instance;
+			$zoom_id = 'wp-quadratum-shortcode-zoom-' . $instance;
+			$content = array ();
 		
-		extract (shortcode_atts (array (
-			'width' => 300,
-			'width_units' => 'px',
-			'height' => 300,
-			'height_units' => 'px',
-			'zoom' => 16
-		), $atts));
+			extract (shortcode_atts (array (
+				'width' => 300,
+				'width_units' => 'px',
+				'height' => 300,
+				'height_units' => 'px',
+				'zoom' => 16
+			), $atts));
 
-		if (strpos($width_units, 'px') === false && strpos($width_units, '%') === false) {
-			$width_units = 'px';
+			if (strpos($width_units, 'px') === false && strpos($width_units, '%') === false) {
+				$width_units = 'px';
+			}
+			if (strpos($height_units, 'px') === false && strpos($height_units, '%') === false) {
+				$height_units = 'px';
+			}
+
+			$args = array ();
+			$args['width'] = $width;
+			$args['width_units'] = $width_units;
+			$args['height'] = $height;
+			$args['height_units'] = $height_units;
+			$args['zoom'] = $zoom;
+			$args['container-class'] = 'wp-quadratum-shortcode-container';
+			$args['container-id'] = $container_id;
+			$args['map-class'] = 'wp-quadratum-shortcode-map';
+			$args['map-id'] = $map_id;
+			$args['venue-class'] = 'wp-quadratum-shortcode-venue';
+			$args['form-id'] = $form_id;
+			$args['zoom-id'] = $zoom_id;
+			$args['instance'] = $instance;
+			$content = WP_QuadratumFrontEnd::render_checkin_map ($args, true);
+			$instance++;
+
+			$content = implode (PHP_EOL, $content);
 		}
-		if (strpos($height_units, 'px') === false && strpos($height_units, '%') === false) {
-			$height_units = 'px';
+		
+		return $content;
+	}
+	
+	function locality_shortcode($atts, $content=null) {
+		$options = WP_Quadratum::get_option();
+		if ($options['enable_locality_sc'] === 'on') {
+			extract (shortcode_atts (array (
+				'type' => 'locality'
+			), $atts));
+
+			$type = strtolower($type);
+
+			if ($this->checkin) {
+				$value = __('No information currently available', 'wp-quadratum');
+				$location = null;
+				if (isset($this->checkin) && isset($this->checkin->venue) && isset($this->checkin->venue->location)) {
+					$location = $this->checkin->venue->location;
+				}
+				
+				switch ($type) {
+					case 'venue':
+						if (isset($this->checkin) && isset($this->checkin->venue) && isset($this->checkin->venue->name)) {
+							$value = $this->checkin->venue->name;
+						}
+						break;
+						
+					case 'address':
+						if (isset($location) && isset($location->address)) {
+							$value = $location->address;
+						}
+						else if (isset($location) && isset($location->lat) && isset($location->lng)) {
+							$cache = $this->get_reverse_geocode($location);
+							if (isset($cache['address'])) {
+								$value = $cache['address'];
+							}
+						}
+						break;
+
+					case 'region':
+						if (isset($location) && isset($location->lat) && isset($location->lng)) {
+							$cache = $this->get_reverse_geocode($location);
+							if (isset($cache['region'])) {
+								$value = $cache['region'];
+							}
+						}
+						break;
+						
+					case 'postcode':
+						if (isset($location) && isset($location->lat) && isset($location->lng)) {
+							$cache = $this->get_reverse_geocode($location);
+							if (isset($cache['postcode'])) {
+								$value = $cache['postcode'];
+							}
+						}
+						break;
+						
+					case 'coordinates':
+						if (isset($location) && isset($location->lat) && isset($location->lng)) {
+							$value = $location->lat . ',' . $location->lng;
+						}
+						break;
+
+					case 'timezone':
+						if (isset($this->checkin) && isset($this->checkin->timeZone)) {
+							$value = $this->checkin->timeZone;
+						}
+						break;
+						
+					case 'tzoffset':
+						if (isset($this->checkin) && isset($this->checkin->timeZoneOffset)) {
+							$tzo = $this->checkin->timeZoneOffset;
+							$minus = strpos($tzo, '-');
+							if ($minus === 0) {
+								$tzo = substr($tzo, $minus, 1);
+								$minus = '-';
+							}
+							else {
+								$minus = '+';
+							}
+							$tzo = $tzo / 60;
+							$value = 'GMT' . $minus . $tzo;
+						}
+						break;
+						
+					case 'locality':
+					default:
+						if (isset($location) && isset($location->city)) {
+							$value = $location->city;
+						}
+						else if (isset($location) && isset($location->lat) && isset($location->lng)) {
+							$cache = $this->get_reverse_geocode($location);
+							$value = $cache['locality'];
+						}
+						break;
+				}
+			}
+			
+			$content = '<span class="wp-quadratum-' . $type . '">' . $value . '</span>';
 		}
 
-		$args = array ();
-		$args['width'] = $width;
-		$args['width_units'] = $width_units;
-		$args['height'] = $height;
-		$args['height_units'] = $height_units;
-		$args['zoom'] = $zoom;
-		$args['container-class'] = 'wp-quadratum-shortcode-container';
-		$args['container-id'] = $container_id;
-		$args['map-class'] = 'wp-quadratum-shortcode-map';
-		$args['map-id'] = $map_id;
-		$args['venue-class'] = 'wp-quadratum-shortcode-venue';
-		$args['form-id'] = $form_id;
-		$args['zoom-id'] = $zoom_id;
-		$args['instance'] = $instance;
-		$content = WP_QuadratumFrontEnd::render_checkin_map ($args, true);
-		$instance++;
-
-		return implode (PHP_EOL, $content);
+		return $content;
+	}
+	
+	private function get_reverse_geocode($location) {
+		if ($this->cache === null) {
+			require_once(FACTUAL_DRIVER_SRC);
+			
+			$options = WP_Quadratum::get_option();
+			$factual = new Factual($options['factual_oauth_key'], $options['factual_oauth_secret']);
+			$point = new FactualPoint($location->lat, $location->lng);
+			try {
+				//$start = microtime(true);
+				$response = $factual->factualReverseGeocode($point);
+				$this->cache = $response[0];
+				WP_Quadratum::set_cache('locality', $this->cache);
+			}
+			
+			catch (FactualApiException $e) {
+				$this->cache = WP_Quadratum::get_cache('locality');
+			}
+			//$end = (microtime(true) - $start);
+			//error_log('Cache refreshed in ' . $end . ' secs');
+		}
+		
+		return $this->cache;
 	}
 	
 	public function wp_enqueue_scripts() {

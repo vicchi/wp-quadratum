@@ -40,6 +40,7 @@ define('WPQUADRATUM_ADMIN_SRC', WPQUADRATUM_PATH . 'includes/class-wp-quadratum-
 define('WPQUADRATUM_FRONTEND_SRC', WPQUADRATUM_PATH . 'includes/class-wp-quadratum-frontend.php');
 
 define('FOURSQUARE_HELPER_SRC', WPQUADRATUM_PATH . 'includes/foursquare-helper/foursquare-helper.php');
+define('FACTUAL_DRIVER_SRC', WPQUADRATUM_PATH . 'includes/factual-php-driver/Factual.php');
 
 include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 

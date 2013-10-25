@@ -21,6 +21,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		self::$tab_names = array (
 			'foursquare' => "Foursquare",
 			'maps' => "Maps",
+			'shortcodes' => __('Shortcodes'),
 			'defaults' => "Defaults",
 			'colophon' => "Colophon"
 			);
@@ -278,6 +279,11 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$this->admin_upgrade_option($options, 'microsoft7_key', '');
 
 				case '131':
+					$this->admin_upgrade_option($options, 'enable_map_sc', 'on');
+					$this->admin_upgrade_option($options, 'enable_locality_sc', '');
+					$this->admin_upgrade_option($options, 'factual_oauth_key', '');
+					$this->admin_upgrade_option($options, 'factual_oauth_secret', '');
+					
 					$cache = array();
 					$cache['timestamp'] = time();
 					$cache['checkin'] = null;
@@ -313,6 +319,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		$wrapped_content = array ();
 		$foursquare_settings = array ();
 		$foursquare_title = __('Foursquare OAuth Settings');
+		$factual_title = __('Factual OAuth Settings');
 		$nokia_settings = array ();
 		$nokia_title = __('Nokia Location API Settings');
 
@@ -323,7 +330,9 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		$openlayers_settings = array ();
 		$openmq_settings = array ();
 		$bingv7_settings = array();
-		
+
+		$shortcodes_settings = array();
+
 		$tab = $this->admin_validate_tab ();
 		//$providers = $this->mxn->get_supported_providers ();
 		$maps = WP_Mapstraction::get_instance()->get_supported_maps();
@@ -397,6 +406,41 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					<small>' . __('Enter your Bing API key', 'wp-quadratum') . '</small></p>';
 				break;
 				
+			case 'shortcodes':
+				/****************************************************************************
+	 	 	 	 * Shortcodes tab content
+	 	 	 	 */
+			
+				$shortcodes_settings[] = '<p><em>' . __('This tab allows you to control whether the plugin\'s shortcodes are acted on in post or page content.', 'wp-quadratum') . '</em></p>';
+				$shortcodes_settings[] = '<p><strong>' . __('Enable Map Shortcode Usage', 'wp-quadratum') . '</strong><br/>
+					<input type="checkbox" name="wp_quadratum_enable_map_sc" id="wp-quadratum-enable-map-sc" '
+					.checked ($options['enable_map_sc'], 'on', false)
+					. '/>
+					<small>' . __('Enable use of the <code>[wp_quadratum]</code> and <code>[wpq_map]</code> shortcodes</em>', 'wp-quadratum') . '</small></p>';
+				$shortcodes_settings[] = '<p><strong>' . __('Enable Locality Shortcode Usage', 'wp-quadratum') . '</strong><br/>
+					<input type="checkbox" name="wp_quadratum_enable_locality_sc" id="wp-quadratum-enable-locality-sc" '
+					.checked ($options['enable_locality_sc'], 'on', false)
+					. '/>
+					<small>' . __('Enable use of the <code>[wp_quadratum_locality]</code> and <code>[wpq_locality]</code> shortcodes</em>', 'wp-quadratum') . '</small></p>';
+
+				if (!empty($options['factual_oauth_key']) && !empty($options['factual_oauth_secret'])) {
+					$factual_title .= ' (' . __('Successfully Authenticated', 'wp-quadratum') . ')';
+				}
+				else {
+					$factual_title .= ' (' . __('Not Authenticated', 'wp-quadratum') . ')';
+				}
+
+				$factual_settings[] = '<p><em>' . __('You\'ve enabled support for the Locality Shortcode. This allows you to embed the postal code, address, region, locality or geographic coordinates of your last Foursquare checkin in a page or post. Unfortunately not all Foursquare Venues contain this information. WP Quadratum can obtain this missing information for you by using a service called a <a href="http://en.wikipedia.org/wiki/Reverse_geocoding" target="_blank">reverse geocoder</a> from Factual. To do this, you\'ll need to sign up for a <a href="https://www.factual.com/api-keys/request" target="_blank">Factual API Key</a> and enter the OAuth key and secret below.', 'wp-quadratum') . '</em></p>';
+
+				$factual_settings[] = '<p><strong>' . __('Factual OAuth Key') . '</strong><br />
+					<input type="text" name="wp_quadratum_factual_oauth_key" id="wp-quadratum-factual-oauth-key" value="' . $options['factual_oauth_key'] . '" /><br />
+					<small>Your Factual API OAuth key</small></p>';
+
+				$factual_settings[] = '<p><strong>' . __('Factual OAuth Secret') . '</strong><br />
+					<input type="text" name="wp_quadratum_factual_oauth_secret" id="wp-quadratum-factual-oauth-secret" value="' . $options['factual_oauth_secret'] . '" /><br />
+					<small>Your Factual API OAuth secret</small></p>';
+				break;
+
 			case 'defaults':
 				/****************************************************************************
  	 	 	 	 * Defaults tab content
@@ -435,22 +479,27 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	 	 	 	 * Foursquare Authentication tab content
 	 	 	 	 */
 
-				if (empty ($options['oauth_token'])) {
-					$foursquare_title .= __(' (Not Authenticated)');
-				}
+				$have_oauth_token = !empty($options['oauth_token']);
+				$have_client_id = !empty($options['client_id']);
 
-				else {
+				if ($have_oauth_token) {
 					$foursquare_title .= __(' (Successfully Authenticated)');
 				}
 
-				$foursquare_settings[] = '<p><em>' . __('This tab allows you to authenticate with Foursquare to allow WP Quadratum to display your checkins.', 'wp-quadratum') . '</em></p>';
+				else {
+					$foursquare_title .= __(' (Not Authenticated)');
+				}
 
-				if (empty ($options['oauth_token'])) {
+				$foursquare_settings[] = '<p><em>' . __('This tab allows you to authenticate with Foursquare to allow WP Quadratum to display your checkins.', 'wp-quadratum') . '</em></p>';
+				$foursquare_settings[] = '<div>';
+
+				$disabled = '';
+				if (!$have_oauth_token) {
 					$foursquare_settings[] = '<div class="wp-quadratum-error">'
 						. __('You are not currently authenticated with the Foursquare API.')
 						. '</div>';
 
-					$foursquare_settings[] = '<div><p>'
+					$foursquare_settings[] = '<p>'
 						. __('To display your Foursquare checkins, WP Quadratum needs to be authorised to access your Foursquare account information; this is a simple, safe and secure 3 step process. WP Quadratum never sees your account login information and cannot store any personally identifiable information.')
 						. '</p>'
 						. '<p><strong>'
@@ -472,31 +521,34 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						. '<p><strong>'
 						. __('Step 2. Copy and paste the supplied Client id and Client secret below and click on the "Save Foursquare Settings" button')
 						. '</strong></p>';
+				}
 
-					$foursquare_settings[] = '<p><strong>' . __('Foursquare Client ID') . '</strong><br />
-						<input type="text" name="wp_quadratum_client_id" id="wp-quadratum-client-id" value="' . $options['client_id'] . '" /><br />
-						<small>Your Foursquare API Client ID</small></p>';
+				else {
+					$disabled = ' disabled="disabled"';
+				}
 
-					$foursquare_settings[] = '<p><strong>' . __('Foursquare Client Secret') . '</strong><br />
-						<input type="text" name="wp_quadratum_client_secret" id="wp-quadratum-client-secret" value="' . $options['client_secret'] . '" /><br />
-						<small>Your Foursquare API Client Secret</small></p>';
 
-					if (!empty ($options['client_id'])) {
-						$foursquare_settings[] = '<p><strong>'
-						. __('Step 3. You should now be authorised and ready to go; click on the <em>Connect to Foursquare</em> button below.')
-						. '</strong></p>';
+				$foursquare_settings[] = '<p><strong>' . __('Foursquare Client ID') . '</strong><br />
+					<input type="text" name="wp_quadratum_client_id" id="wp-quadratum-client-id" value="' . $options['client_id'] . '"' . $disabled . ' /><br />
+					<small>Your Foursquare API Client ID</small></p>';
 
-						$client_id = $options['client_id'];
-						$client_secret = $options['client_secret'];
-						$redirect_url = WP_Quadratum::make_redirect_url ();
-						$fh = new FoursquareHelper_v1_0 ($client_id, $client_secret, $redirect_url);
-						$foursquare_settings[] = '<p class="submit">'
-							. '<a href="' . $fh->authentication_link () . '" class="button-primary">'
-							. __('Connect to Foursquare') . '</a>'
-							. '</p>';
-					}
+				$foursquare_settings[] = '<p><strong>' . __('Foursquare Client Secret') . '</strong><br />
+					<input type="text" name="wp_quadratum_client_secret" id="wp-quadratum-client-secret" value="' . $options['client_secret'] . '"' . $disabled . ' /><br />
+					<small>Your Foursquare API Client Secret</small></p>';
 
-					$foursquare_settings[] = '</div>';
+				if (!$have_client_id) {
+					$foursquare_settings[] = '<p><strong>'
+					. __('Step 3. You should now be authorised and ready to go; click on the <em>Connect to Foursquare</em> button below.')
+					. '</strong></p>';
+
+					$client_id = $options['client_id'];
+					$client_secret = $options['client_secret'];
+					$redirect_url = WP_Quadratum::make_redirect_url ();
+					$fh = new FoursquareHelper_v1_0 ($client_id, $client_secret, $redirect_url);
+					$foursquare_settings[] = '<p class="submit">'
+						. '<a href="' . $fh->authentication_link () . '" class="button-primary">'
+						. __('Connect to Foursquare') . '</a>'
+						. '</p>';
 				}
 
 				else {
@@ -504,6 +556,8 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						. __('You are currently successfully authenticated with the Foursquare API.')
 						. '</div>';
 				}
+
+				$foursquare_settings[] = '</div>';
 				break;
 
 		}	// end-switch ($tab);
@@ -534,6 +588,16 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$block = $map . '_settings';
 					$wrapped_content[] = $this->admin_postbox ($id, $title, implode ('', $$block), $hidden);
 				}	// end-foreach
+				break;
+				
+			case 'shortcodes':
+				$wrapped_content[] = $this->admin_postbox('wp-quadratum-shortcodes-settings',
+					'Shortcodes', implode('', $shortcodes_settings));
+
+				$hidden = ($options['enable_locality_sc'] !== 'on');
+				$wrapped_content[] = $this->admin_postbox('wp-quadratum-factual-settings',
+					$factual_title, implode('', $factual_settings), $hidden);
+					break;
 				break;
 				
 			case 'defaults':
@@ -598,6 +662,13 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						$options['google_key'] = html_entity_decode ($this->admin_option ('wp_quadratum_google_key'));
 						$options['openmq_key'] = html_entity_decode ($this->admin_option ('wp_quadratum_openmq_key'));
 						$options['microsoft7_key'] = html_entity_decode ($this->admin_option ('wp_quadratum_microsoft7_key'));
+						break;
+						
+					case 'shortcodes':
+						$options['enable_map_sc'] = $this->admin_option('wp_quadratum_enable_map_sc');
+						$options['enable_locality_sc'] = $this->admin_option('wp_quadratum_enable_locality_sc');
+						$options['factual_oauth_key'] = html_entity_decode($this->admin_option('wp_quadratum_factual_oauth_key'));
+						$options['factual_oauth_secret'] = html_entity_decode($this->admin_option('wp_quadratum_factual_oauth_secret'));
 						break;
 						
 					case 'defaults':
@@ -695,6 +766,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	                    <div class="meta-box-sortables">
 	                    <?php
 							echo $this->admin_help_and_support ();
+							echo $this->acknowledgements();
 	                    ?>
 	                    </div>
 	                </div>
@@ -717,6 +789,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		switch ($tab) {
 			case 'foursquare':
 			case 'maps':
+			case 'shortcodes':
 			case 'defaults':
             	$content[] = '<p class="submit">';
 				$content[] = '<input type="submit" name="wp_quadratum_option_submitted" class="button-primary" value="';
@@ -758,7 +831,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			. '</ul>'
 			. '</p>'
 			. '<p>'
-			. __('But ... help and support is a two way street; here\'s what you might want to do:')
+			. __('But help and support is a two way street; here\'s what you might want to do:')
 			. '<ul>'
 			. '<li>'
 			. sprintf (__('If you like this plugin and use it on your WordPress site, or if you write about it online, <a href="http://www.vicchi.org/codeage/wp-quadratum/">link to the plugin</a> and drop me an <a href="mailto:%s">email</a> telling me about this.'), $email_address)
@@ -767,12 +840,25 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			. __('Rate the plugin on the <a href="http://wordpress.org/extend/plugins/wp-quadratum/">WordPress plugin repository</a>.')
 			. '</li>'
 			. '<li>'
-			. __('WP Quadratum is both free as in speech and free as in beer; <a href="http://www.vicchi.org/codeage/donate/">here\'s why</a>.')
+			. __('WP Quadratum is free; no premium or light version, no ads. If you\'d like to support this plugin <a href="http://www.vicchi.org/codeage/donate/">here\'s how</a>.', 'wp-quadratum')
 			. '</li>'
 			. '</ul>'
 			. '</p>';
 
 		return $this->admin_postbox ('wp-quadratum-support', __('Help &amp; Support'), $content);
+	}
+
+	function acknowledgements() {
+		$content = array();
+		
+		$content[] = '<p>';
+		$content[] = sprintf(__('Checkin data powered by <a href="%s" target="_blank">Foursquare</a>. Reverse geocoding courtesy of <a href="%s" target="_blank">Factual</a>', 'wp-quadratum'),
+			'https://foursquare.com/',
+			'http://www.factual.com/'
+			);
+		$content[] = '</p>';
+		
+		return $this->admin_postbox('wp-quadratum-legal', __('Acknowledgements', 'wp-quadratum'), implode(PHP_EOL, $content));
 	}
 
 	/**
