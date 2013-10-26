@@ -430,6 +430,9 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$factual_title .= ' (' . __('Not Authenticated', 'wp-quadratum') . ')';
 				}
 
+				$have_factual_key = !empty($options['factual_oauth_key']);
+				$have_factual_secret = !empty($options['factual_oauth_secret']);
+
 				$factual_settings[] = '<p><em>' . __('You\'ve enabled support for the Locality Shortcode. This allows you to embed the postal code, address, region, locality or geographic coordinates of your last Foursquare checkin in a page or post. Unfortunately not all Foursquare Venues contain this information. WP Quadratum can obtain this missing information for you by using a service called a <a href="http://en.wikipedia.org/wiki/Reverse_geocoding" target="_blank">reverse geocoder</a> from Factual. To do this, you\'ll need to sign up for a <a href="https://www.factual.com/api-keys/request" target="_blank">Factual API Key</a> and enter the OAuth key and secret below.', 'wp-quadratum') . '</em></p>';
 
 				$factual_settings[] = '<p><strong>' . __('Factual OAuth Key') . '</strong><br />
@@ -439,6 +442,19 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				$factual_settings[] = '<p><strong>' . __('Factual OAuth Secret') . '</strong><br />
 					<input type="text" name="wp_quadratum_factual_oauth_secret" id="wp-quadratum-factual-oauth-secret" value="' . $options['factual_oauth_secret'] . '" /><br />
 					<small>Your Factual API OAuth secret</small></p>';
+
+				if ($have_factual_key && $have_factual_secret) {
+					$factual_settings[] = '<div class="wp-quadratum-success">'
+						. __('You are currently successfully authenticated with the Factual API.')
+						. '</div>';
+				}
+				
+				else {
+					$factual_settings[] = '<div class="wp-quadratum-warning">'
+						. __('You are not currently authenticated with the Factual API; the Locality Shortcode will be disabled.')
+						. '</div>';
+				}
+				
 				break;
 
 			case 'defaults':
@@ -852,7 +868,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		$content = array();
 		
 		$content[] = '<p>';
-		$content[] = sprintf(__('Checkin data powered by <a href="%s" target="_blank">Foursquare</a>. Reverse geocoding courtesy of <a href="%s" target="_blank">Factual</a>', 'wp-quadratum'),
+		$content[] = sprintf(__('Checkin data powered by <a href="%s" target="_blank">Foursquare</a>. Reverse geocoding courtesy of <a href="%s" target="_blank">Factual</a>.', 'wp-quadratum'),
 			'https://foursquare.com/',
 			'http://www.factual.com/'
 			);

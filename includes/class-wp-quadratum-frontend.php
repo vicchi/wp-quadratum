@@ -178,7 +178,9 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	
 	function locality_shortcode($atts, $content=null) {
 		$options = WP_Quadratum::get_option();
-		if ($options['enable_locality_sc'] === 'on') {
+		if ($options['enable_locality_sc'] === 'on' &&
+				!empty($options['factual_oauth_key']) &&
+				!empty($options['factual_oauth_secret'])) {
 			extract (shortcode_atts (array (
 				'type' => 'locality'
 			), $atts));
