@@ -261,6 +261,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 						
 					case 'locality':
 					default:
+						$type = 'locality';
 						if (isset($location) && isset($location->city)) {
 							$value = $location->city;
 						}
@@ -270,9 +271,13 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 						}
 						break;
 				}
+
+				$content = '<span class="wp-quadratum-'
+					. $type . '">'
+					. apply_filters('wp_quadratum_locality', $type, $value)
+					. '</span>';
 			}
 			
-			$content = '<span class="wp-quadratum-' . $type . '">' . $value . '</span>';
 		}
 
 		return $content;
