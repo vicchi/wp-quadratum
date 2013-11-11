@@ -2,9 +2,9 @@
 Contributors: vicchi
 Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
-Requires at least: 3.6.0
-Tested up to: 3.6.0
-Stable tag: 1.3.0
+Requires at least: 3.7.0
+Tested up to: 3.7.1
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -74,10 +74,10 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Screenshots ==
 
-1. Settings and Options: Foursquare Tab; Client ID and Client Secret entered
+1. Installed Plugins: Authentication prompt shown after activating plugin for the first time
+1. Settings and Options: Foursquare Tab; No Client ID or Client Secret entered or saved
 1. Settings and Options: Foursquare Tab; Client ID and Client Secret saved
-1. Foursquare Authentication; not logged in
-1. Foursquare Authentication; logged in
+1. Foursquare Authentication: Allow or deny plugin access to your Foursquare account
 1. Settings and Options: Foursquare Tab; Successfully authenticated with Foursquare
 1. Settings and Options: Maps Tab; HERE Maps configuration
 1. Settings and Options: Maps Tab; Google Maps v3 configuration
@@ -85,6 +85,9 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 1. Settings and Options: Maps Tab; Bing Maps v7 configuration
 1. Settings and Options: Maps Tab; OpenLayers Maps configuration
 1. Settings and Options: Maps Tab; MapQuest Open Maps configuration
+1. Settings and Options: Shortcode Tab; [wp_quadratum] shortcode enabled
+1. Settings and Options: Shortcode Tab; [wp_quadratum_locality] shortcode enabled, no Factual OAuth Key or Secret entered or saved
+1. Settings and Options: Shortcode Tab; [wp_quadratum_locality] shortcode enabled, no Factual OAuth Key or Secret saved
 1. Settings and Options: Defaults Tab
 1. Settings and Options: Colophon Tab
 1. Appearance: Widgets; Sample widget settings
@@ -93,7 +96,18 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.3.0 (2013.08.22)
+The current version is 1.3.1 (2013.10.23)
+
+= 1.3.1 =
+* Released: 2013.10.23
+* Added: Caching of last good response from the Foursquare API, allowing the plugin to operate if the API is temporarily down.
+* Added: New locality shortcodes, `[wp_quadratum_locality]` (and `[wpq_locality]` as an alias) to allow the last checkin's venue name, address, region, postal code, coordinates, timezone and/or timezone offset to be embedded in posts or pages.
+* Added: New checkin map shortcodes, `[wp_quadratum_map]` and `[wpq_map]` as aliases for the plugin's `[wp_quadratum]` shortcode.
+* Added: Ability for the plugin's shortcodes to be made configurable, on and off.
+* Added: Ability to backfill the response of the Foursquare API, via Factual's reverse geocoder, to cope with cases when a Foursquare venue doesn't have a complete set of metadata attributes to be used in conjunction with the locality shortcodes.
+* Added: New filter, `wp_quadratum_locality`, to filter and amend the output of the `[wp_quadratum_locality]` shortcode.
+* Fixed: Detect and trap an invalid or empty response from the Foursquare API, preventing numerous PHP warnings from polluting a post or page.
+* Other: Fully compatible with WordPress v3.7 "Basie".
 
 = 1.3.0 =
 * Released: 2013.08.22
@@ -110,14 +124,14 @@ The current version is 1.3.0 (2013.08.22)
 * Removed: Support for the `Widget ID` field from the plugin's widget; the plugin now uses the WordPress assigned widget instance.
 * Other: Transitioned to `WP_Mapstraction` from `WP_MXNHelper`.
 
-= 1.2 =
+= 1.2.0 =
 * Released: 2012.11.06
 * Added: Support for the `wp_quadratum_strapline` filter.
 * Added: Enqueue non-minified versions of the plugin's CSS and JS files if `WP_DEBUG` or `WPQUADRATUM_DEBUG` are defined.
 * Other: Updated to latest versions of `WP_PluginBase` and `WP_MXNHelper`.
 * Other: Moved all submodule classes/libraries from the plugin's root directory to /includes.
 
-= 1.1 =
+= 1.1.0 =
 * Released: 2012.07.01
 * Added: Support for Nokia, CloudMade, Google and OpenLayers maps via Mapstraction
 * Added: Split plugin settings and options into Foursquare, Maps, Defaults and Colophon tabs
@@ -132,10 +146,13 @@ Fixed: Non W3C/HTML4 compliant widget code which caused the map not to be displa
 Summary: Minor fixes to PHP base class.
 Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Quadratum extends.
 
-= 1.0 =
+= 1.0.0 =
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+= 1.3.1 =
+Cache last good Foursquare checkin response for when the Foursquare API is down. Add new locality shortcode. This release is fully compatible with WordPress 3.7 "Basie".
+
 = 1.3.0 =
 Fix issue where the map did not load due to new GitHub content serving policy. Add support for Leaflet, Bing and MapQuest Open maps. Add new `wp_quadratum_checkin` filter.
 
@@ -156,7 +173,11 @@ This is the 2nd version of WP Quadratum; fixing an issue with the PHP base class
 
 == Shortcode Support And Usage ==
 
-WP Quadratum supports a single shortcode, `[wp_quadratum]`. Adding this shortcode to the content of a post or page or into a theme template as content, expands the shortcode and replaces it with a checkin map.
+WP Quadratum supports two shortcodes and three shortcode aliases; `[wp_quadratum_map]` to expand the shortcode in a post or page and replace it with the checkin map and `[wp_quadratum_locality]` to allow you to embed aspects of your last checkin in a post or page.
+
+= [wp_quadratum_map] =
+
+Adding this shortcode to the content of a post or page as content, expands the shortcode and replaces it with a checkin map.
 
 The shortcode also supports multiple *attributes* which allow you to customise the way in which the shortcode is expanded into the checkin map:
 
@@ -166,32 +187,69 @@ The shortcode also supports multiple *attributes* which allow you to customise t
 * the `height_units` attribute
 * the `zoom` attribute
 
-= The "width" Attribute =
+** The "width" Attribute **
 
 The `width` attribute, in conjunction with the `height` attribute specifies the width of the map to be inserted into a post or page. If omitted, the map width defaults to a value of `300`.
 
-= The "width_units" Attribute =
+** The "width_units" Attribute **
 
 The `width_units` attribute, specifies how the value specified in the `width` attribute should be interpreted. Valid values for this attribute as `px` and `%`, denoting that the `width` attribute should be interpreted in pixels or as a percentage respectively. If omitted, this attribute defaults to a value of `px`.
 
-= The "height" Attribute =
+** The "height" Attribute **
 
 The `height` attribute, in conjunction with the `width` attribute specifies the height of the map to be inserted into a post or page. If omitted, the map height defaults to a value of `300`.
 
-= The "height_units" Attribute =
+** The "height_units" Attribute **
 
 The `height_units` attribute, specifies how the value specified in the `height` attribute should be interpreted. Valid values for this attribute as `px` and `%`, denoting that the `height` attribute should be interpreted in pixels or as a percentage respectively. If omitted, this attribute defaults to a value of `px`.
 
-= The "zoom" Attribute =
+** The "zoom" Attribute **
 
 The `zoom` attribute specifies the zoom level to be used when displaying the checkin map. If omitted, the zoom level defaults to a value of `16` which is roughly analogous to a neighbourhood zoom.
 
+= [wp_quadratum] =
+
+The `[wp_quadratum]` shortcode is an alias for the `[wp_quadratum_map]` shortcode and has the same functionality.
+
+= [wpq_map] =
+
+The `[wpq_map]` shortcode is an alias for the `[wp_quadratum_map]` shortcode and has the same functionality.
+
+= [wp_quadratum_locality] =
+
+Adding this shortcode to the content of a post or page, expands the shortcode and replaces it with information about your last Foursquare checkin. The information to be displayed is selected by the shortcode's `type` attribute, which allows you to select the venue name, address, region, postal code, coordinates, timezone or timezone offset.
+
+By default, the `[wp_quadratum_locality]` shortcode and the `[wpq_locality]` alias is disabled. This is because not all Foursquare venues contain the full scope of locality elements that the shortcode supports (the minimum requirements for a Foursquare venue are name, category and coordinates). To backfill any missing venue elements, WP Quadratum uses a *reverse geocoding* service from [Factual](http://www.factual.com/) to supply the missing information.
+
+To enable the `[wp_quadratum_locality]` shortcode, from the Dashboard navigate to *Settings / WP Quadratum* and click on the *Shortcodes* tab. Select the *Enable Locality Shortcode Usage* checkbox and the *Factual OAuth Settings* meta-box will appear. You'll then need to sign up for a [Factual API key](https://www.factual.com/api-keys/request) after which you'll be given an *OAuth Key* and *OAuth Secret*. Copy and paste these into the *Factual OAuth* text fields and click on *Save Shortcode Settings*. You'll now be able to use the `[wp_quadratum_locality]` shortcode or its alias.
+
+
+**The "type" Attribute**
+
+The `type` attribute specifies the element of your last Foursquare checkin that is to be displayed in a post or page and can take one of the following values:
+
+* `venue` - the name of the last Foursquare venue you checked into.
+* `address` - the street address of the venue; not including the region, locality or postal code.
+* `region` - the region of the venue; the geographic context of the region will vary from country to country but is roughly analogous to the venue's city.
+* `postcode` - the postal code of the venue, if the country or region supports postal codes.
+* `coordinates` - the geographic coordinates of the venue, in the form latitude,longitude.
+* `timezone` - the timezone name of the time of the checkin, such as `Europe/London`.
+* `tzoffset` - the offset from GMT of the time of the checkin, in the form GMT[-+]hours, such as GMT-1 or GMT+2.
+* `locality` - the locality of the venue; the geographic context of the locality will vary according to country, but is roughly analogous to the town or neighbourhood.
+
+If the `type` attribute is not supplied, or if the value of this attribute is not one of the above values, `type="locality"` will be assumed. The shortcode's replacement value can be modified via the plugin's `wp_quadratum_locality` filter; see the *Filter Support and Usage* section for more information.
+
+= [wpq_locality] =
+
+The `[wpq_locality]` shortcode is an alias for the `[wp_quadratum_locality]` shortcode and has the same functionality.
+
 == Filter Support And Usage ==
 
-WP Quadratum supports two filters, which are described in more detail below. The plugin's filters allow you to:
+WP Quadratum supports three filters, which are described in more detail below. The plugin's filters allow you to:
 
 * change the descriptive text that appears immediately below the map when displayed via the plugin's widget or shortcode.
 * gain access to the checkin metadata that is returned from the Foursquare API
+* change the output of the [wp_quadratum_locality]` shortcode
 
 = wp_quadratum_checkin =
 
@@ -223,4 +281,16 @@ function format_strapline($content, $params) {
 	
 	$strapline = '<h5>Last seen at <a href="' . $params['venue-url'] . '" target="_blank">' . $params['venue-name'] . '</a> on ' . date('l jS \of F Y h:i:s A', $params['checked-in-at']) . '</h5>';
 	return $strapline;
+}`
+
+= wp_quadratum_locality =
+
+Applied to the replacement content of the `[wp_quadratum_locality]` shortcode immediately before the shortcode is replaced. The filter's hook function is passed two arguments; the shortcode's value and correspondng `type` attribute.
+
+*Example:* Wrap each invocation of the `[wp_quadratum_locality]` shortcode in a `div` whose class includes the attribute type.
+
+`add_filter('wp_quadratum_locality', 'format_locality', 10, 2);
+function format_locality($value, $type) {
+	$class = 'wp-quadratum-locality-' . $type;
+	return '<div class="' . $class . '">' . $value . '</div>';
 }`
