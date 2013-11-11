@@ -495,8 +495,10 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	 	 	 	 * Foursquare Authentication tab content
 	 	 	 	 */
 
-				$have_oauth_token = !empty($options['oauth_token']);
-				$have_client_id = !empty($options['client_id']);
+				
+				$have_oauth_token = (isset($options['oauth_token']) && !empty($options['oauth_token']));
+				$have_client_id = (isset($options['client_id']) && !empty($options['client_id']));
+				$have_client_secret = (isset($options['client_secret']) && !empty($options['client_secret']));
 
 				if ($have_oauth_token) {
 					$foursquare_title .= __(' (Successfully Authenticated)');
@@ -510,7 +512,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				$foursquare_settings[] = '<div>';
 
 				$disabled = '';
-				if (!$have_oauth_token) {
+				if (!$have_client_id && !$have_client_secret) {
 					$foursquare_settings[] = '<div class="wp-quadratum-error">'
 						. __('You are not currently authenticated with the Foursquare API.')
 						. '</div>';
@@ -552,7 +554,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					<input type="text" name="wp_quadratum_client_secret" id="wp-quadratum-client-secret" value="' . $options['client_secret'] . '"' . $disabled . ' /><br />
 					<small>Your Foursquare API Client Secret</small></p>';
 
-				if (!$have_client_id) {
+				if ($have_client_id && $have_client_secret && !$have_oauth_token) {
 					$foursquare_settings[] = '<p><strong>'
 					. __('Step 3. You should now be authorised and ready to go; click on the <em>Connect to Foursquare</em> button below.')
 					. '</strong></p>';
@@ -567,7 +569,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						. '</p>';
 				}
 
-				else {
+				else if ($have_oauth_token) {
 					$foursquare_settings[] = '<div class="wp-quadratum-success">'
 						. __('You are currently successfully authenticated with the Foursquare API.')
 						. '</div>';
