@@ -6,6 +6,8 @@ if (!class_exists('WP_Quadratum')) {
 	
 		const OPTIONS = 'wp_quadratum_settings';
 		const CACHE = 'wp_quadratum_cache';
+		const LOCALITY_CACHE = 'locality';
+		const CHECKIN_CACHE = 'checkin';
 		const VERSION = '131';
 		const DISPLAY_VERSION = 'v1.3.1';
 	
@@ -218,18 +220,11 @@ if (!class_exists('WP_Quadratum')) {
 			}
 		}
 		
-		static function get_cache() {
-			$num_args = func_num_args();
+		static function get_cache($key=NULL) {
 			$cache = get_option(self::CACHE);
-			
-			if ($num_args > 0) {
-				$args = func_get_args();
-				$key = $args[0];
-				$value = '';
-				if (isset($cache[$key])) {
-					$value = $cache[$key];
-				}
-				return $value;
+
+			if (isset($key) && !empty($key)) {
+				return json_decode($cache[$key]);
 			}
 			
 			else {
@@ -253,7 +248,7 @@ if (!class_exists('WP_Quadratum')) {
 		static function set_cache($key, $value) {
 			$cache = get_option(self::CACHE);
 			$cache['timestamp'] = time();
-			$cache[$key] = $value;
+			$cache[$key] = json_encode($value);
 			update_option(self::CACHE, $cache);
 		}
 

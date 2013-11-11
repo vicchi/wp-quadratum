@@ -274,10 +274,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 				$content = '<span class="wp-quadratum-'
 					. $type . '">'
-					. apply_filters('wp_quadratum_locality', $type, $value)
+					. apply_filters('wp_quadratum_locality', $value, $type)
 					. '</span>';
+
 			}
-			
 		}
 
 		return $content;
@@ -294,11 +294,11 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 				//$start = microtime(true);
 				$response = $factual->factualReverseGeocode($point);
 				$this->cache = $response[0];
-				WP_Quadratum::set_cache('locality', $this->cache);
+				WP_Quadratum::set_cache(WP_Quadratum::LOCALITY_CACHE, $this->cache);
 			}
 			
 			catch (FactualApiException $e) {
-				$this->cache = WP_Quadratum::get_cache('locality');
+				$this->cache = WP_Quadratum::get_cache(WP_Quadratum::LOCALITY_CACHE);
 			}
 			//$end = (microtime(true) - $start);
 			//error_log('Cache refreshed in ' . $end . ' secs');
@@ -331,7 +331,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		
 		$json = WP_Quadratum::get_foursquare_checkins ();
 		if (!$this->validate_checkin($json)) {
-			$json = WP_Quadratum::get_cache('checkin');
+			$json = WP_Quadratum::get_cache(WP_Quadratum::CHECKIN_CACHE);
 			if ($this->validate_checkin($json)) {
 				$have_checkin = true;
 				$cached_checkin = true;
@@ -370,7 +370,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			wp_localize_script($handle, 'WPQuadratum', $args);
 			
 			if (!$cached_checkin) {
-				WP_Quadratum::set_cache('checkin', $json);
+				WP_Quadratum::set_cache(WP_Quadratum::CHECKIN_CACHE, $json);
 			}
 		}
 		//}
