@@ -290,6 +290,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$cache['locality'] = null;
 					update_option(WP_Quadratum::CACHE, $cache);
 
+				case '1311':
 					$options['version'] = WP_Quadratum::VERSION;
 					$upgrade_settings = true;
 

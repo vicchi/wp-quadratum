@@ -4,7 +4,7 @@ Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.7.0
 Tested up to: 3.7.1
-Stable tag: 1.3.1
+Stable tag: 1.3.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -87,7 +87,7 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 1. Settings and Options: Maps Tab; MapQuest Open Maps configuration
 1. Settings and Options: Shortcode Tab; [wp_quadratum] shortcode enabled
 1. Settings and Options: Shortcode Tab; [wp_quadratum_locality] shortcode enabled, no Factual OAuth Key or Secret entered or saved
-1. Settings and Options: Shortcode Tab; [wp_quadratum_locality] shortcode enabled, no Factual OAuth Key or Secret saved
+1. Settings and Options: Shortcode Tab; [wp_quadratum_locality] shortcode enabled, Factual OAuth Key and Secret saved
 1. Settings and Options: Defaults Tab
 1. Settings and Options: Colophon Tab
 1. Appearance: Widgets; Sample widget settings
@@ -96,7 +96,12 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.3.1 (2013.10.23)
+The current version is 1.3.1.1 (2013.11.28)
+
+= 1.3.1.1 =
+* Released: 2013.11.28
+* Fixed: Bug in checking for when the `[wp_quadratum_map]` and `[wpq_map]` shortcodes are enabled.
+* Updated: Factual PHP driver to latest version.
 
 = 1.3.1 =
 * Released: 2013.10.23
@@ -150,6 +155,9 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+= 1.3.1.1 =
+Fixed bug in checking for when the `[wp_quadratum_map]` and `[wpq_map]` shortcodes are enabled. Updated Factual PHP driver to latest version.
+
 = 1.3.1 =
 Cache last good Foursquare checkin response for when the Foursquare API is down. Add new locality shortcode. This release is fully compatible with WordPress 3.7 "Basie".
 
