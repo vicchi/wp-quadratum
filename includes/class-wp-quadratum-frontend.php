@@ -122,6 +122,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	 */
 
 	function map_shortcode ($atts, $content=null) {
+		$options = WP_Quadratum::get_option();
 		if ($options['enable_map_sc'] === 'on') {
 			// TODO: handle self-closing and enclosing shortcode forms properly
 			// TODO: this function is fugly; need to break out the checkin acquisition
