@@ -6,4 +6,4 @@
 	url = git://github.com/vicchi/wp-plugin-base.git
 [submodule "includes/factual-php-driver"]
 	path = includes/factual-php-driver
-	url = git@github.com:Factual/factual-php-driver.git
+	url = git://github.com/Factual/factual-php-driver.git
