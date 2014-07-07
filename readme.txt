@@ -2,9 +2,9 @@
 Contributors: vicchi
 Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
-Requires at least: 3.7.0
-Tested up to: 3.7.1
-Stable tag: 1.3.1.1
+Requires at least: 3.9.0
+Tested up to: 3.9.1
+Stable tag: 1.3.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,7 +96,11 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.3.1.1 (2013.11.28)
+The current version is 1.3.1.2 (2014.07.07)
+
+= 1.3.1.2 =
+* Released: 2014.07.07
+* Fixed: Updated Foursquare `DATEVERIFIED` version parameter to prevent API calls verified prior to `20120609` being rejected.
 
 = 1.3.1.1 =
 * Released: 2013.11.28
@@ -155,6 +159,9 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+= 1.3.1.2 =
+* Updated Foursquare `DATEVERIFIED` version parameter to prevent API calls verified prior to `20120609` being rejected.
+
 = 1.3.1.1 =
 Fixed bug in checking for when the `[wp_quadratum_map]` and `[wpq_map]` shortcodes are enabled. Updated Factual PHP driver to latest version.
 
@@ -286,7 +293,7 @@ function format_strapline($content, $params) {
 	//		'venue-name' => 'checkin venue name',
 	//		'checked-in-at' => 'timestamp of checkin'
 	//	);
-	
+
 	$strapline = '<h5>Last seen at <a href="' . $params['venue-url'] . '" target="_blank">' . $params['venue-name'] . '</a> on ' . date('l jS \of F Y h:i:s A', $params['checked-in-at']) . '</h5>';
 	return $strapline;
 }`

@@ -3,22 +3,22 @@
 if (!class_exists('WP_Quadratum')) {
 	class WP_Quadratum extends WP_PluginBase_v1_1 {
 		private static $instance;
-	
+
 		const OPTIONS = 'wp_quadratum_settings';
 		const CACHE = 'wp_quadratum_cache';
 		const LOCALITY_CACHE = 'locality';
 		const CHECKIN_CACHE = 'checkin';
-		const VERSION = '1311';
-		const DISPLAY_VERSION = 'v1.3.1';
-	
+		const VERSION = '1312';
+		const DISPLAY_VERSION = 'v1.3.2';
+
 		/**
 		 * Class constructor
 		 */
-	
+
 		private function __construct () {
 			$this->hook ('plugins_loaded');
 		}
-	
+
 		public static function get_instance() {
 			if (!isset(self::$instance)) {
 				$class = __CLASS__;
@@ -41,20 +41,20 @@ if (!class_exists('WP_Quadratum')) {
 		static function make_settings_link () {
 			return 'plugin_action_links_' . WPQUADRATUM_NAME;
 		}
-	
+
 		/**
 		 * "plugins_loaded" action hook; called after all active plugins and pluggable functions
 		 * are loaded.
 		 *
 		 * Adds front-end display actions, shortcode support and admin actions.
 		 */
-	 
+
 		function plugins_loaded () {
 			register_activation_hook (__FILE__, array ($this, 'add_settings'));
-		
+
 			$this->hook ('init');
 			$this->hook ('widgets_init');
-		
+
 			if (is_admin ()) {
 				// For admin_init, admin_menu, admin_print_styles, admin_print_scripts and
 				// plugin_action_links hooks, now see includes/wp-quadratum-admin.php
@@ -67,7 +67,7 @@ if (!class_exists('WP_Quadratum')) {
 				// includes/wp-quadratum-frontend.php
 
 				require_once (WPQUADRATUM_FRONTEND_SRC);
-			
+
 				$options = WP_Quadratum::get_option();
 				$map = $options['provider'];
 				$maps = WP_Mapstraction::get_instance()->get_supported_maps();
@@ -79,38 +79,38 @@ if (!class_exists('WP_Quadratum')) {
 
 				WP_Mapstraction::get_instance()->set_footer(true);
 				WP_Mapstraction::get_instance()->add_map($map);
-			
+
 			}
 		}
-	
+
 		function nokia_auth() {
 			$options = WP_Quadratum::get_option();
 			return (array('app-id' => $options['nokia_app_id'],
 				'auth-token' => $options['nokia_app_token']));
 		}
-	
+
 		function googlev3_auth() {
 			$options = WP_Quadratum::get_option();
 			return (array('key' => $options['google_key'],
 				'sensor' => $options['google_sensor']));
 		}
-	
+
 		function microsoft7_auth() {
 			$options = WP_Quadratum::get_option();
 			return (array('key' => $options['microsoft7_key']));
 		}
-	
+
 		function openmq_auth() {
 			$options = WP_Quadratum::get_option();
 			return (array('key' => $options['openmq_key']));
 		}
-	
+
 		/**
 		 * "wp_mxn_helper_providers" filter hook; called to trim the list of Mapstraction
 		 * providers that WP MXN Helper supports to the list that this plugin currently
 		 * supports
 		 */
-	
+
 		/*function trim_mapstraction_providers ($providers) {
 			//$plugin_providers = array ('nokia', 'googlev3', 'leaflet', 'openmq', 'cloudmade', 'openlayers');
 			$plugin_providers = array ('nokia', 'googlev3', 'cloudmade', 'openlayers');
@@ -120,10 +120,10 @@ if (!class_exists('WP_Quadratum')) {
 					$trimmed_providers[$pname] = $pchar;
 				}
 			}
-		
+
 			return $trimmed_providers;
 		}*/
-	
+
 		/**
 		 * "init" action hook; called to initialise the plugin
 		 */
@@ -132,7 +132,7 @@ if (!class_exists('WP_Quadratum')) {
 			$lang_dir = basename (dirname (__FILE__)) . DIRECTORY_SEPARATOR . 'lang';
 			load_plugin_textdomain ('wp-quadratum', false, $lang_dir);
 		}
-	
+
 		/**
 		 * "widgets_init" action hook; called to initialise the plugin's widget(s)
 		 */
@@ -140,7 +140,7 @@ if (!class_exists('WP_Quadratum')) {
 		function widgets_init () {
 			return register_widget ('WP_QuadratumWidget');
 		}
-	
+
 		/**
 		 * plugin activation / "activate_pluginname" action hook; called when the plugin is
 		 * first activated.
@@ -178,7 +178,7 @@ if (!class_exists('WP_Quadratum')) {
 
 				update_option (self::OPTIONS, $settings);
 			}
-			
+
 			$cache = WP_Quadratum::get_cache();
 			if (!is_array($cache)) {
 				$cache = array(
@@ -189,14 +189,14 @@ if (!class_exists('WP_Quadratum')) {
 				update_option(self::CACHE, $cache);
 			}
 		}
-	
+
 		/**
 		 * Queries the back-end database for WP Quadratum settings and options.
 		 *
 		 * @param string $key Optional settings/options key name; if specified only the value
 		 * for the key will be returned, if the key exists, if omitted all settings/options
 		 * will be returned.
-		 * @return mixed If $key is specified, a string containing the key's settings/option 
+		 * @return mixed If $key is specified, a string containing the key's settings/option
 		 * value is returned, if the key exists, else an empty string is returned. If $key is
 		 * omitted, an array containing all settings/options will be returned.
 		 */
@@ -214,19 +214,19 @@ if (!class_exists('WP_Quadratum')) {
 				}
 				return $value;
 			}
-		
+
 			else {
 				return $options;
 			}
 		}
-		
+
 		static function get_cache($key=NULL) {
 			$cache = get_option(self::CACHE);
 
 			if (isset($key) && !empty($key)) {
 				return json_decode($cache[$key]);
 			}
-			
+
 			else {
 				return $cache;
 			}
@@ -266,12 +266,12 @@ if (!class_exists('WP_Quadratum')) {
 		 * Helper function to make a style filename load debug or minimized CSS depending
 		 * on the setting of WP_DEBUG and/or WPQUADRATUM_DEBUG.
 		 */
-	
+
 		static function make_css_path($stub) {
 			if (WP_Quadratum::is_debug()) {
 				return $stub . '.css';
 			}
-		
+
 			return $stub . '.min.css';
 		}
 
@@ -279,12 +279,12 @@ if (!class_exists('WP_Quadratum')) {
 		 * Helper function to make a script filename load debug or minimized JS depending
 		 * on the setting of WP_DEBUG and/or WPQUADRATUM_DEBUG.
 		 */
-	
+
 		static function make_js_path($stub) {
 			if (WP_Quadratum::is_debug()) {
 				return $stub . '.js';
 			}
-		
+
 			return $stub . '.min.js';
 		}
 
@@ -308,7 +308,7 @@ if (!class_exists('WP_Quadratum')) {
 				$json = json_decode($rsp);
 				return $json;
 			}
-			
+
 			return $rsp;
 		}
 
