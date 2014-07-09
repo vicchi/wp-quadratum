@@ -4,7 +4,7 @@ Donate Link: http://www.vicchi.org/codeage/donate/
 Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
 Requires at least: 3.9.0
 Tested up to: 3.9.1
-Stable tag: 1.3.1.2
+Stable tag: 1.3.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,7 +96,12 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.3.1.2 (2014.07.07)
+The current version is 1.3.1.3 (2014.07.09)
+
+= 1.3.1.3 =
+* Released: 2014.07.09
+* Fixed: Updated category icon handling in line with Foursquare API changes
+* Added: Local black and white cached category icons
 
 = 1.3.1.2 =
 * Released: 2014.07.07
@@ -159,6 +164,9 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+= 1.3.1.3 =
+* Updated category icon handling in line with Foursquare API changes and added black and white cached icons
+
 = 1.3.1.2 =
 * Updated Foursquare `DATEVERIFIED` version parameter to prevent API calls verified prior to `20120609` being rejected.
 

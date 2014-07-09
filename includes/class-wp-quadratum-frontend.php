@@ -12,16 +12,16 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	const WIDGET_VERSION = 'array_version';
 
 	private static $instance;
-	
+
 	private $widgets = null;
 	private $checkin = null;
 	private $cache = null;
 	private $icon_url = null;
-	
+
 	/**
 	 * Class constructor
 	 */
-	
+
 	private function __construct () {
 		add_shortcode('wp_quadratum', array($this, 'map_shortcode'));
 		add_shortcode('wp_quadratum_map', array($this, 'map_shortcode'));
@@ -29,7 +29,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 		add_shortcode('wp_quadratum_locality', array($this, 'locality_shortcode'));
 		add_shortcode('wpq_locality', array($this, 'locality_shortcode'));
-		
+
 		$this->hook('wp_loaded');
 		$this->hook('wp_enqueue_scripts');
 	}
@@ -45,7 +45,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 	function wp_loaded() {
 		$this->get_widgets();
 	}
-	
+
 
 	/**
 	 * Create the HTML and Javascript for the checkin map
@@ -104,7 +104,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		else {
 			$content[] = '<h5>Something went wrong; the Foursquare API might be down?</h5>';
 		}
-		
+
 		return $content;
 	}
 
@@ -130,7 +130,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			// both the shortcode, the widget and the the_content filter (when I write it)
 			// TODO: check and handle error responses from the 4sq API
 			// TODO: handle 4sq API response caching
-		
+
 			static $instance = 0;
 
 			$container_id = 'wp-quadratum-shortcode-container-' . $instance;
@@ -138,7 +138,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			$form_id = 'wp-quadratum-shortcode-form-' . $instance;
 			$zoom_id = 'wp-quadratum-shortcode-zoom-' . $instance;
 			$content = array ();
-		
+
 			extract (shortcode_atts (array (
 				'width' => 300,
 				'width_units' => 'px',
@@ -173,10 +173,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 			$content = implode (PHP_EOL, $content);
 		}
-		
+
 		return $content;
 	}
-	
+
 	function locality_shortcode($atts, $content=null) {
 		$options = WP_Quadratum::get_option();
 		if ($options['enable_locality_sc'] === 'on' &&
@@ -194,14 +194,14 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 				if (isset($this->checkin) && isset($this->checkin->venue) && isset($this->checkin->venue->location)) {
 					$location = $this->checkin->venue->location;
 				}
-				
+
 				switch ($type) {
 					case 'venue':
 						if (isset($this->checkin) && isset($this->checkin->venue) && isset($this->checkin->venue->name)) {
 							$value = $this->checkin->venue->name;
 						}
 						break;
-						
+
 					case 'address':
 						if (isset($location) && isset($location->address)) {
 							$value = $location->address;
@@ -222,7 +222,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 							}
 						}
 						break;
-						
+
 					case 'postcode':
 						if (isset($location) && isset($location->lat) && isset($location->lng)) {
 							$cache = $this->get_reverse_geocode($location);
@@ -231,7 +231,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 							}
 						}
 						break;
-						
+
 					case 'coordinates':
 						if (isset($location) && isset($location->lat) && isset($location->lng)) {
 							$value = $location->lat . ',' . $location->lng;
@@ -243,7 +243,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 							$value = $this->checkin->timeZone;
 						}
 						break;
-						
+
 					case 'tzoffset':
 						if (isset($this->checkin) && isset($this->checkin->timeZoneOffset)) {
 							$tzo = $this->checkin->timeZoneOffset;
@@ -259,7 +259,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 							$value = 'GMT' . $minus . $tzo;
 						}
 						break;
-						
+
 					case 'locality':
 					default:
 						$type = 'locality';
@@ -283,11 +283,11 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 		return $content;
 	}
-	
+
 	private function get_reverse_geocode($location) {
 		if ($this->cache === null) {
 			require_once(FACTUAL_DRIVER_SRC);
-			
+
 			$options = WP_Quadratum::get_option();
 			$factual = new Factual($options['factual_oauth_key'], $options['factual_oauth_secret']);
 			$point = new FactualPoint($location->lat, $location->lng);
@@ -297,17 +297,17 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 				$this->cache = $response[0];
 				WP_Quadratum::set_cache(WP_Quadratum::LOCALITY_CACHE, $this->cache);
 			}
-			
+
 			catch (FactualApiException $e) {
 				$this->cache = WP_Quadratum::get_cache(WP_Quadratum::LOCALITY_CACHE);
 			}
 			//$end = (microtime(true) - $start);
 			//error_log('Cache refreshed in ' . $end . ' secs');
 		}
-		
+
 		return $this->cache;
 	}
-	
+
 	public function wp_enqueue_scripts() {
 		$handle = 'wp-quadratum-frontend-script';
 		$src = WPQUADRATUM_URL . 'js/wp-quadratum-frontend';
@@ -329,7 +329,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		//if (count($this->widgets) !== 0) {
 		$have_checkin = false;
 		$cached_checkin = false;
-		
+
 		$json = WP_Quadratum::get_foursquare_checkins ();
 		if (!$this->validate_checkin($json)) {
 			$json = WP_Quadratum::get_cache(WP_Quadratum::CHECKIN_CACHE);
@@ -341,7 +341,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		else {
 			$have_checkin = true;
 		}
-		
+
 		if ($have_checkin) {
 			$checkins = $json->response->checkins->items;
 
@@ -349,15 +349,9 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 
 			$venue = $checkins[0]->venue;
 			$location = $venue->location;
-			$categories = $venue->categories;
 			$venue_url = 'https://foursquare.com/v/' . $venue->id;
-			foreach ($categories as $category) {
-				$icon_url = $category->icon;
-				break;
-			}
-			if (is_object ($icon_url)) {
-				$icon_url = $icon_url->prefix . '32' . $icon_url->name;
-			}
+			$category = $venue->categories[0];
+			$icon_url = WPQUADRATUM_URL . '/icons/' . $category->id . '_32.png';
 
 			$args = array(
 				'provider' => $provider,
@@ -369,29 +363,28 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			$this->icon_url = $icon_url;
 
 			wp_localize_script($handle, 'WPQuadratum', $args);
-			
+
 			if (!$cached_checkin) {
 				WP_Quadratum::set_cache(WP_Quadratum::CHECKIN_CACHE, $json);
 			}
 		}
-		//}
 	}
-	
+
 	private function validate_checkin($json) {
 		if ($json === false || $json === null) {
 			return false;
 		}
-		
+
 		if (!isset($json->response) || !isset($json->response->checkins) || !isset($json->response->checkins->items)) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	private function get_widgets() {
 		$this->widgets = array();
-		
+
 		// A widget is referenced in the WP back-end by the lowercased version of
 		// the argument passed to register_widget. In wp-quadratum.php we call ...
 		//
@@ -399,41 +392,41 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 		//
 		// ... from the widgets_init hook, thus WP_QuadratumWidget is referenced
 		// as wp_quadratumwidget.
-		
+
 		// The settings for all instances of a widget (active and inactive) are
 		// stored in a serialised array in the wp_options table called widget_'reference'.
 		// So the settings for all instances of WP_QuadratumWidget are contained in
 		// 'widget_wp_quadratumwidget'
-		
+
 		// Get a copy of this widget's settings; bale if we can't find the settings
-		
+
 		$options = get_option('widget_wp_quadratumwidget');
 		if (!is_array($options) || count($options) === 0) {
 			error_log('Can\'t find the options for widget_wp_quadratum_widget in wp_options');
 			error_log('Maybe something\'s changed in this version of WordPress?');
 			return;
 		}
-		
+
 		// The master list of all widgets, inactive and active are stored in a serialised
 		// array, also in wp_options, called 'sidebars_widgets'. Get a cop of this and bale
 		// if we can't find it ...
-		
+
 		$widgets = get_option('sidebars_widgets');
 		if (!is_array($widgets) || count($widgets) === 0) {
 			error_log('Can\'t find the options for sidebars_widgets in wp_options');
 			error_log('Maybe something\'s changed in this version of WordPress?');
 			return;
 		}
-		
+
 		foreach ($widgets as $key => $val) {
 			// Inactive widgets are stored in an array keyed on 'wp_inactive_widgets'.
 			// The version number for the master widget list is keyed on 'array_version'.
 			// Skip both of these keys ...
-			
+
 			if ($key == self::INACTIVE_WIDGETS || $key == self::WIDGET_VERSION) {
 				continue;
 			}
-			
+
 			// The remaining elements of the master list are keyed on the sidebar id,
 			// one element per defined sidebar (which may or may not bear some resemblance
 			// to the HTML id for the sidebar, but this is theme dependent).
@@ -444,7 +437,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			// names, in the form 'name-id' where 'id' is the instance id for this
 			// widget instance and also the key for this instance's settings in the
 			// widget's settings array, held in $options above ...
-			
+
 			if (is_array($val) && (count($val) !== 0)) {
 				foreach ($val as $index => $widget_id) {
 					$pos = strpos($widget_id, self::ID_PREFIX);
@@ -453,7 +446,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 						if ($pos !== false) {
 							$widget_name = substr($widget_id, 0, $pos);
 							$widget_inst = substr($widget_id, ++$pos);
-							
+
 							if (array_key_exists($widget_inst, $options)) {
 								$this->widgets[] = array(
 									'id' => $widget_id,
@@ -468,7 +461,7 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			}
 		}
 	}
-	
+
 }	// end class WP_QuadratumFrontEnd
 
 WP_QuadratumFrontEnd::get_instance();

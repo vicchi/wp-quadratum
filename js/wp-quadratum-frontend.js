@@ -1,7 +1,7 @@
 (function($) {
 	if (typeof WPQuadratum != 'undefined') {
 		var wp_quadratum_maps = {};
-		
+
 		if (typeof WPQuadratum.widgets != 'undefined') {
 			$.each(WPQuadratum.widgets, function(index, widget) {
 				var map_div = 'wp-quadratum-widget-map-' + widget['instance'];
@@ -12,7 +12,7 @@
 				}
 			});
 		}
-		
+
 		$('div[id^=wp-quadratum-shortcode-map]').each(function() {
 			var elements = this.id.split('-');
 			var instance = elements[elements.length - 1];
@@ -40,4 +40,3 @@
 		map.addMarker(marker);
 	}
 })(jQuery);
-
