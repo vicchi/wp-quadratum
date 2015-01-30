@@ -351,7 +351,10 @@ class WP_QuadratumFrontEnd extends WP_PluginBase_v1_1 {
 			$location = $venue->location;
 			$venue_url = 'https://foursquare.com/v/' . $venue->id;
 			$category = $venue->categories[0];
-			$icon_url = WPQUADRATUM_URL . '/icons/' . $category->id . '_32.png';
+			$icon = $category->icon;
+			$prefix = $icon->prefix;
+			$suffix = $icon->suffix;
+			$icon_url = $prefix . 'bg_32' . $suffix;
 
 			$args = array(
 				'provider' => $provider,
