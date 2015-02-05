@@ -7,16 +7,16 @@
 class WP_QuadratumWidget extends WP_Widget {
 	function __construct() {
 		$widget_ops = array (
-			'description' => __('Displays your last Foursquare checkin')
+			'description' => __('Displays your last Swarm checkin')
 			);
 		parent::WP_Widget ('WP_QuadratumWidget', __('WP Quadratum'), $widget_ops);
 	}
-	
+
 	/**
 	 * Outputs the widget settings/options form on the Dashboard's Appearance -> Widgets
 	 * screen
 	 */
-	
+
 	function form($instance) {
 		$text_stub = '<label for="%s">%s</label><input type="text" id="%s" name="%s" value="%s" class="widefat" />';
 		$check_stub = '<input type="checkbox" id="%s" name="%s" %s /><label for="%s">%s</label>';
@@ -25,7 +25,7 @@ class WP_QuadratumWidget extends WP_Widget {
 		$instance = wp_parse_args (
 			(array)$instance,
 			array (
-				'title' => __('Last Foursquare Checkin'),
+				'title' => __('Last Swarm Checkin'),
 				'width' => 200,
 				'width_units' => 'px',
 				'height' => 200,
@@ -97,7 +97,7 @@ class WP_QuadratumWidget extends WP_Widget {
 
 		echo implode('', $content);
 	}
-	
+
 	/**
 	 * Processes the widget settings/options form on the Dashboard's Appearance -> Widgets
 	 * screen
@@ -105,17 +105,17 @@ class WP_QuadratumWidget extends WP_Widget {
 
 	function update($new_instance, $old_instance) {
 		$instance = $old_instance;
-		
+
 		$instance['title'] = strip_tags ($new_instance['title']);
 		$instance['width'] = (int)strip_tags ($new_instance['width']);
 		$instance['width_units'] = strip_tags($new_instance['width_units']);
 		$instance['height'] = (int)strip_tags ($new_instance['height']);
 		$instance['height_units'] = strip_tags($new_instance['height_units']);
 		$instance['zoom'] = (int)strip_tags ($new_instance['zoom']);
-		
+
 		return $instance;
 	}
-	
+
 	/**
 	 * Outputs the contents of the widget on the front-end
 	 */
@@ -123,7 +123,7 @@ class WP_QuadratumWidget extends WP_Widget {
 	function widget($args, $instance) {
 		extract ($args, EXTR_SKIP);
 		$id = $this->get_widget_id($args);
-		
+
 		$content = $before_widget;
 		if ($instance['title']) {
 			$content .= $before_title
@@ -132,14 +132,14 @@ class WP_QuadratumWidget extends WP_Widget {
 		}
 		$content .= $this->show_checkin_map ($instance, $id);
 		$content .= $after_widget;
-		
+
 		echo $content;
 	}
-	
+
 	/**
 	 * Outputs the contents of the checkin map within the widget
 	 */
-	
+
 	function show_checkin_map($instance, $id) {
 		$content = array ();
 
@@ -155,23 +155,23 @@ class WP_QuadratumWidget extends WP_Widget {
 		$args['map-id'] = 'wp-quadratum-widget-map-' . $id;
 		$args['venue-class'] = 'wp-quadratum-widget-venue';
 		$content = WP_QuadratumFrontEnd::get_instance()->render_checkin_map ($args);
-			
+
 		return implode (PHP_EOL, $content);
 	}
-	
+
 	private function get_widget_id($args) {
 		$widget_id = $args['widget_id'];
 		$widget_name = null;
 		$widget_inst = null;
-		
+
 		$pos = strpos($widget_id, '-');
 		if ($pos !== false) {
 			$widget_name = substr($widget_id, 0, $pos);
 			$widget_inst = substr($widget_id, ++$pos);
 		}
-		
+
 		return $widget_inst;
 	}
-	
+
 }	// end class WP_QuadratumWidget
 ?>

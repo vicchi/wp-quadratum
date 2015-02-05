@@ -7,17 +7,17 @@
 class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	private static $instance;
 	private $mxn;
-	
+
 	static $tab_names;
-	
+
 	/**
 	 * Class constructor
 	 */
-	
+
 	private function __construct () {
 		$this->mxn = WP_Mapstraction::get_instance();
 		//$this->mxn = new WP_MXNHelper_v2_0;
-		
+
 		self::$tab_names = array (
 			'foursquare' => "Foursquare",
 			'maps' => "Maps",
@@ -25,14 +25,14 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			'defaults' => "Defaults",
 			'colophon' => "Colophon"
 			);
-		
+
 		$this->hook ('admin_init');
 		$this->hook ('admin_menu');
 		$this->hook ('admin_print_scripts');
 		$this->hook ('admin_print_styles');
 		$this->hook (WP_Quadratum::make_settings_link (), 'admin_settings_link');
 	}
-	
+
 	public static function get_instance() {
 		if (!isset(self::$instance)) {
 			$class = __CLASS__;
@@ -52,7 +52,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		if (empty ($options['oauth_token'])) {
 			$this->hook ('admin_notices');
 		}
-	}	
+	}
 
 	/**
 	 * "admin_notices" action hook; called if the plugin is active but not configured.
@@ -60,13 +60,13 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 	function admin_notices () {
 		if (current_user_can ('manage_options')) {
-			$content = sprintf (__('You need to grant WP Quadratum access to your Foursquare account to show your checkins; you can go to the <a href="%s">WP Quadratum Settings And Options page</a> to do this now'),
+			$content = sprintf (__('You need to grant WP Quadratum access to your Foursquare account to show your Swarm checkins; you can go to the <a href="%s">WP Quadratum Settings And Options page</a> to do this now'),
 				admin_url ('options-general.php?page=wp-quadratum/includes/class-wp-quadratum-admin.php'));
 
 			echo '<div class="error">' . $content . '</div>';
 		}
 	}
-		
+
 	/**
 	 * "admin_menu" action hook; called after the basic admin panel menu structure is in
 	 * place.
@@ -95,14 +95,14 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			wp_enqueue_script ('dashboard');
 			wp_enqueue_script ('jquery');
 			$deps = array ('jquery');
-			
+
 			$handle = 'wp-quadratum-admin-script';
 			$src = WPQUADRATUM_URL . 'js/wp-quadratum-admin';
 			$src = WP_Quadratum::make_js_path($src);
 			wp_enqueue_script ($handle, $src, $deps);
 		}
 	}
-	
+
 	/**
 	 * "admin_print_styles" action hook; called to enqueue admin specific CSS.
 	 */
@@ -116,7 +116,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			wp_enqueue_style ('dashboard');
 			wp_enqueue_style ('global');
 			wp_enqueue_style ('wp-admin');
-			
+
 			$handle = 'wp-quadratum-admin-css';
 			$src = WPQUADRATUM_URL . 'css/wp-quadratum-admin';
 			$src = WP_Quadratum::make_css_path($src);
@@ -188,7 +188,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				case '102':
 				case '110':
 					$this->admin_upgrade_option ($options, 'provider', 'nokia');
-					
+
 					if (isset ($options['app_id'])) {
 						$this->admin_upgrade_option ($options, 'nokia_app_id', $options['app_id']);
 						unset ($options['app_id']);
@@ -201,7 +201,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$this->admin_upgrade_option ($options, 'google_key', '');
 					$this->admin_upgrade_option ($options, 'google_sensor', 'false');
 					$this->admin_upgrade_option ($options, 'cloudmade_key', '');
-				
+
 				case '120':
 				case '130':
 					// This is verging dangerously close to fugly but, as far as I can tell
@@ -217,7 +217,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					// something like this ...
 					//
 					// array (
-					//	2 => 
+					//	2 =>
 					//		array (
 					//			'title' => 'Last Foursquare Checkin',
 					//			'width' => 200,
@@ -225,7 +225,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					//			'zoom' => 16,
 					//			'id' => 1,
 					//		),
-					//	3 => 
+					//	3 =>
 					//		array ( .. ),
 					//	'_multiwidget' => 1,
 					// )
@@ -237,7 +237,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					// meta array, prune the now obsolete 'id' setting and, if they don't
 					// exist, add in defaulted settings for the new 'width_units' and
 					// 'height_units' settings. Simple really.
-					
+
 					$widgets = get_option('widget_wp_quadratumwidget');
 					if (is_array($widgets)) {
 						$upgraded = array();
@@ -283,7 +283,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$this->admin_upgrade_option($options, 'enable_locality_sc', '');
 					$this->admin_upgrade_option($options, 'factual_oauth_key', '');
 					$this->admin_upgrade_option($options, 'factual_oauth_secret', '');
-					
+
 					$cache = array();
 					$cache['timestamp'] = time();
 					$cache['checkin'] = null;
@@ -291,6 +291,9 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					update_option(WP_Quadratum::CACHE, $cache);
 
 				case '1311':
+				case '1312':
+				case '1313':
+				case '1314':
 					$options['version'] = WP_Quadratum::VERSION;
 					$upgrade_settings = true;
 
@@ -303,7 +306,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			}
 		}
 	}
-	
+
 	/**
 	 * add_options_page() callback function; called to emit the plugin's settings/options
 	 * page.
@@ -311,12 +314,12 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 	function admin_display_settings () {
 		$options = $this->admin_save_settings ();
-		
+
 		//$auth_plugin_installed = WP_Quadratum::is_wpna_installed ();
 		//$auth_plugin_active = WP_Quadratum::is_wpna_active ();
 		$auth_plugin_installed = false;
 		$auth_plugin_active = false;
-		
+
 		$wrapped_content = array ();
 		$foursquare_settings = array ();
 		$foursquare_title = __('Foursquare OAuth Settings');
@@ -337,13 +340,13 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		$tab = $this->admin_validate_tab ();
 		//$providers = $this->mxn->get_supported_providers ();
 		$maps = WP_Mapstraction::get_instance()->get_supported_maps();
-		
+
 		switch ($tab) {
 			case 'maps':
 				/****************************************************************************
  	 	 	 	 * Maps API Selection & Authentication tab content
  	 	 	 	 */
-				$maps_settings[] = '<p><em>' . __('This tab allows you to choose which Mapstraction mapping API will be used to show your Foursquare checkins. Note that not all supported Mapstraction APIs are shown here; support for more mapping APIs may be added in a future release.', 'wp-quadratum') . '</em></p>';
+				$maps_settings[] = '<p><em>' . __('This tab allows you to choose which Mapstraction mapping API will be used to show your Swarm checkins. Note that not all supported Mapstraction APIs are shown here; support for more mapping APIs may be added in a future release.', 'wp-quadratum') . '</em></p>';
 
 				$maps_settings[] = '<select name="wp_quadratum_map_provider" id="wp-quadratum-map-provider">';
 				foreach ($maps as $map => $meta) {
@@ -361,7 +364,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				$nokia_settings[] = '<p><strong>' . __('App Token') . '</strong><br />
 					<input type="text" name="wp_quadratum_nokia_app_token" id="wp_quadratum_nokia_app_token" value="' . $options['nokia_app_token'] . '" size="35" /><br />
 					<small>' . __('Enter your registered HERE App Token') . '</small></p>';
-				
+
 				$googlev3_settings[] = '<p><em>'
 					. __('You\'ve selected Google Maps. To use Google Maps, you\'ll need an API key; you can get one from the <a href="https://code.google.com/apis/console/" target="_blank">Google Code APIs Console</a>.', 'wp-quadratum')
 					. '</em></p>';
@@ -387,7 +390,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				$openlayers_settings[] = '<p><em>'
 					. __('You\'ve selected OpenLayers Maps. That\'s all there is. No settings, no API key, no options.', 'wp-quadratum')
 					. '</em></p>';
-					
+
 				$openmq_settings[] = '<p><em>'
 					. __('You\'ve selected MapQuest Open Maps. To use these, you\'ll need an app key; you can get one from the <a href="http://developer.mapquest.com/web/info/account/app-keys" target="_blank">MapQuest Application Keys page</a>.', 'wp-quadratum')
 					. '</em></p>';
@@ -406,12 +409,12 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					. '" /><br />
 					<small>' . __('Enter your Bing API key', 'wp-quadratum') . '</small></p>';
 				break;
-				
+
 			case 'shortcodes':
 				/****************************************************************************
 	 	 	 	 * Shortcodes tab content
 	 	 	 	 */
-			
+
 				$shortcodes_settings[] = '<p><em>' . __('This tab allows you to control whether the plugin\'s shortcodes are acted on in post or page content.', 'wp-quadratum') . '</em></p>';
 				$shortcodes_settings[] = '<p><strong>' . __('Enable Map Shortcode Usage', 'wp-quadratum') . '</strong><br/>
 					<input type="checkbox" name="wp_quadratum_enable_map_sc" id="wp-quadratum-enable-map-sc" '
@@ -434,7 +437,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				$have_factual_key = !empty($options['factual_oauth_key']);
 				$have_factual_secret = !empty($options['factual_oauth_secret']);
 
-				$factual_settings[] = '<p><em>' . __('You\'ve enabled support for the Locality Shortcode. This allows you to embed the postal code, address, region, locality or geographic coordinates of your last Foursquare checkin in a page or post. Unfortunately not all Foursquare Venues contain this information. WP Quadratum can obtain this missing information for you by using a service called a <a href="http://en.wikipedia.org/wiki/Reverse_geocoding" target="_blank">reverse geocoder</a> from Factual. To do this, you\'ll need to sign up for a <a href="https://www.factual.com/api-keys/request" target="_blank">Factual API Key</a> and enter the OAuth key and secret below.', 'wp-quadratum') . '</em></p>';
+				$factual_settings[] = '<p><em>' . __('You\'ve enabled support for the Locality Shortcode. This allows you to embed the postal code, address, region, locality or geographic coordinates of your last Swarm checkin in a page or post. Unfortunately not all Foursquare Venues contain this information. WP Quadratum can obtain this missing information for you by using a service called a <a href="http://en.wikipedia.org/wiki/Reverse_geocoding" target="_blank">reverse geocoder</a> from Factual. To do this, you\'ll need to sign up for a <a href="https://www.factual.com/api-keys/request" target="_blank">Factual API Key</a> and enter the OAuth key and secret below.', 'wp-quadratum') . '</em></p>';
 
 				$factual_settings[] = '<p><strong>' . __('Factual OAuth Key') . '</strong><br />
 					<input type="text" name="wp_quadratum_factual_oauth_key" id="wp-quadratum-factual-oauth-key" value="' . $options['factual_oauth_key'] . '" /><br />
@@ -449,13 +452,13 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						. __('You are currently successfully authenticated with the Factual API.')
 						. '</div>';
 				}
-				
+
 				else {
 					$factual_settings[] = '<div class="wp-quadratum-warning">'
 						. __('You are not currently authenticated with the Factual API; the Locality Shortcode will be disabled.')
 						. '</div>';
 				}
-				
+
 				break;
 
 			case 'defaults':
@@ -472,12 +475,12 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				$defaults_settings[] = sprintf (__('<strong>WARNING!</strong> Checking <strong><em>%s</em></strong> and clicking on <strong><em>%s</em></strong> will erase <strong><em>all</em></strong> the current WP Quadratum settings and options and will restore WP Quadratum to a <em>just installed</em> state. This is the equivalent to deactivating, uninstalling and reinstalling the plugin. Only proceed if this is what you intend to do. This action is final and irreversable.', 'wp-quadratum'), __('Reset WP Quadratum To Defaults', 'wp-quadratum'), __('Save Changes', 'wp-quadratum'));
 				$defaults_settingsp[] = '</p>';
 				break;
-				
+
 			case 'colophon':
 				/****************************************************************************
  	 	 	 	 * Colophon tab content
  	 	 	 	 */
-				
+
 				$colophon_settings[] = '<p><em>"When it comes to software, I much prefer free software, because I have very seldom seen a program that has worked well enough for my needs and having sources available can be a life-saver"</em>&nbsp;&hellip;&nbsp;Linus Torvalds</p>';
 				$colophon_settings[] = '<p>'
 					. __('For the inner nerd in you, the latest version of WP Quadratum was written using <a href="http://macromates.com/">TextMate</a> on a MacBook Pro running OS X 10.8.4 Mountain Lion and tested on the same machine running <a href="http://mamp.info/en/index.html">MAMP</a> (Mac/Apache/MySQL/PHP) before being let loose on the author\'s <a href="http://www.vicchi.org/">blog</a>.')
@@ -496,7 +499,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	 	 	 	 * Foursquare Authentication tab content
 	 	 	 	 */
 
-				
+
 				$have_oauth_token = (isset($options['oauth_token']) && !empty($options['oauth_token']));
 				$have_client_id = (isset($options['client_id']) && !empty($options['client_id']));
 				$have_client_secret = (isset($options['client_secret']) && !empty($options['client_secret']));
@@ -580,7 +583,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				break;
 
 		}	// end-switch ($tab);
-		
+
 		/****************************************************************************
  	 	 * Put it all together ...
  	 	 */
@@ -608,7 +611,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$wrapped_content[] = $this->admin_postbox ($id, $title, implode ('', $$block), $hidden);
 				}	// end-foreach
 				break;
-				
+
 			case 'shortcodes':
 				$wrapped_content[] = $this->admin_postbox('wp-quadratum-shortcodes-settings',
 					'Shortcodes', implode('', $shortcodes_settings));
@@ -618,24 +621,24 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					$factual_title, implode('', $factual_settings), $hidden);
 					break;
 				break;
-				
+
 			case 'defaults':
 				$wrapped_content[] = $this->admin_postbox ('wp-quadratum-defaults-settings',
 					'Defaults', implode ('', $defaults_settings));
 				break;
-				
+
 			case 'colophon':
 				$wrapped_content[] = $this->admin_postbox ('wp-quadratum-colophon-settings',
 					'Colophon', implode ('', $colophon_settings));
 				break;
-				
+
 			case 'foursquare':
 			default:
 				$wrapped_content[] = $this->admin_postbox ('wp-quadratum-foursquare-settings',
 					$foursquare_title, implode('', $foursquare_settings));
 				break;
 		}	// end-switch ($tab)
-		
+
 		$this->admin_wrap ($tab,
 			sprintf (__('WP Quadratum %s - Settings And Options'), WP_Quadratum::DISPLAY_VERSION),
 				implode ('', $wrapped_content));
@@ -667,13 +670,13 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 				$reset_options = false;
 				$update_msg = self::$tab_names[$tab];
 				$action_msg = __('Updated', 'wp-quadratum');
-				
+
 				switch ($tab) {
 					case 'foursquare':
 						$options['client_id'] = $this->admin_option('wp_quadratum_client_id');
 						$options['client_secret'] = $this->admin_option('wp_quadratum_client_secret');
 						break;
-						
+
 					case 'maps':
 						$options['provider'] = $this->admin_option ('wp_quadratum_map_provider');
 						$options['nokia_app_id'] = html_entity_decode ($this->admin_option ('wp_quadratum_nokia_app_id'));
@@ -682,14 +685,14 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 						$options['openmq_key'] = html_entity_decode ($this->admin_option ('wp_quadratum_openmq_key'));
 						$options['microsoft7_key'] = html_entity_decode ($this->admin_option ('wp_quadratum_microsoft7_key'));
 						break;
-						
+
 					case 'shortcodes':
 						$options['enable_map_sc'] = $this->admin_option('wp_quadratum_enable_map_sc');
 						$options['enable_locality_sc'] = $this->admin_option('wp_quadratum_enable_locality_sc');
 						$options['factual_oauth_key'] = html_entity_decode($this->admin_option('wp_quadratum_factual_oauth_key'));
 						$options['factual_oauth_secret'] = html_entity_decode($this->admin_option('wp_quadratum_factual_oauth_secret'));
 						break;
-						
+
 					case 'defaults':
 						$update_options = false;
 						if (isset ($_POST['wp_quadratum_reset_defaults']) &&
@@ -700,13 +703,13 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 							$action_msg = __('Reset To Default Values', 'wp-quadratum');
 						}
 						break;
-						
+
 					case 'colophon':
 					default:
 						$update_options = false;
 						break;
 				}	// end-switch ($tab)
-				
+
 				if ($update_options) {
 					update_option (WP_Quadratum::OPTIONS, $options);
 				}
@@ -716,7 +719,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 					echo sprintf (__('%s Settings And Options %s', 'wp-quadratum'),
 						$update_msg, $action_msg);
 					echo "</p></div>\n";
-					echo "<script 	type=\"text/javascript\">setTimeout(function(){jQuery('#updatemessage').hide('slow');}, 3000);</script>";	
+					echo "<script 	type=\"text/javascript\">setTimeout(function(){jQuery('#updatemessage').hide('slow');}, 3000);</script>";
 				}
 			}
 		}
@@ -724,7 +727,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 		$options = WP_Quadratum::get_option ();
 		return $options;
 	}
-	
+
 	/**
 	 * Creates a postbox entry for the plugin's admin settings/options page.
 	 *
@@ -770,7 +773,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 			<?php echo $this->admin_tabs ($tab); ?>
 	        <form method="post" action="">
 	            <div class="postbox-container wp-quadratum-postbox-settings">
-	                <div class="metabox-holder">	
+	                <div class="metabox-holder">
 	                    <div class="meta-box-sortables">
 	                    <?php
 	                        echo $content;
@@ -781,7 +784,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	                  </div>
 	                </div>
 	                <div class="postbox-container wp-quadratum-postbox-sidebar">
-	                  <div class="metabox-holder">	
+	                  <div class="metabox-holder">
 	                    <div class="meta-box-sortables">
 	                    <?php
 							echo $this->admin_help_and_support ();
@@ -792,7 +795,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 	            </div>
 	        </form>
 	    </div>
-	<?php	
+	<?php
 	}
 
 	/**
@@ -804,7 +807,7 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 	function admin_submit ($tab) {
 		$content = array ();
-		
+
 		switch ($tab) {
 			case 'foursquare':
 			case 'maps':
@@ -869,14 +872,14 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 	function acknowledgements() {
 		$content = array();
-		
+
 		$content[] = '<p>';
 		$content[] = sprintf(__('Checkin data powered by <a href="%s" target="_blank">Foursquare</a>. Reverse geocoding courtesy of <a href="%s" target="_blank">Factual</a>.', 'wp-quadratum'),
 			'https://foursquare.com/',
 			'http://www.factual.com/'
 			);
 		$content[] = '</p>';
-		
+
 		return $this->admin_postbox('wp-quadratum-legal', __('Acknowledgements', 'wp-quadratum'), implode(PHP_EOL, $content));
 	}
 
@@ -890,20 +893,20 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 	function admin_tabs ($current='foursquare') {
 		$content = array ();
-		
+
 		$content[] = '<div id="icon-tools" class="icon32"><br /></div>';
 		$content[] = '<h2 class="nav-tab-wrapper">';
-		
+
 		foreach (self::$tab_names as $tab => $name) {
 			$class = ($tab == $current) ? ' nav-tab-active' : '';
 			$content[] = "<a class='nav-tab$class' href='options-general.php?page=wp-quadratum/includes/class-wp-quadratum-admin.php&tab=$tab'>$name</a>";
 		}	// end-foreach (...)
-		
+
 		$content[] = '</h2>';
-		
+
 		return implode ('', $content);
 	}
-	
+
 	/**
 	 * Check and validate the tab parameter passed as part of the settings/options URL.
 	 */
@@ -918,16 +921,16 @@ class WP_QuadratumAdmin extends WP_PluginBase_v1_1 {
 
 		return $tab;
 	}
-	
+
 	/**
 	 * Reset the plugin's settings/options back to the default values.
 	 */
-	
+
 	function admin_reset_plugin () {
 		delete_option (WP_Quadratum::OPTIONS);
 		WP_Quadratum::add_settings ();
 	}
-	
+
 }	// end-class WP_QuadratumAdmin
 
 WP_QuadratumAdmin::get_instance();

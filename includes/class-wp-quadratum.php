@@ -8,8 +8,8 @@ if (!class_exists('WP_Quadratum')) {
 		const CACHE = 'wp_quadratum_cache';
 		const LOCALITY_CACHE = 'locality';
 		const CHECKIN_CACHE = 'checkin';
-		const VERSION = '1313';
-		const DISPLAY_VERSION = 'v1.3.3';
+		const VERSION = '1314';
+		const DISPLAY_VERSION = 'v1.3.1.4';
 
 		/**
 		 * Class constructor

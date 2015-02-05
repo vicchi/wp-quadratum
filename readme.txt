@@ -1,18 +1,18 @@
 === WP Quadratum ===
 Contributors: vicchi
 Donate Link: http://www.vicchi.org/codeage/donate/
-Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget
+Tags: wp-quadratum, maps, map, foursquare, checkins, checkin, widget, swarm
 Requires at least: 3.9.0
-Tested up to: 3.9.1
-Stable tag: 1.3.1.3
+Tested up to: 4.1.0
+Stable tag: 1.3.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Display your last Foursquare checkin as a map widget in the sidebar or embedded in a post or page, fully authenticated via OAuth 2.0.
+Display your last Swarm checkin as a map widget in the sidebar or embedded in a post or page, fully authenticated via OAuth 2.0.
 
 == Description ==
 
-This plugin allows you to display your last Foursquare checkin as a map widget on the sidebar or embedded via a shortcode in a post or page of your WordPress powered site.
+This plugin allows you to display your last Swarm checkin as a map widget on the sidebar or embedded via a shortcode in a post or page of your WordPress powered site.
 
 Setting and options include:
 
@@ -28,7 +28,7 @@ Setting and options include:
 1. Choose the width and height of the widget and map on the sidebar. The width and height can be specified either as pixels (`px`) or as a percentage.
 1. Choose the zoom level of the map display.
 
-The <em>strapline</em> text containing the venue name, venue URL and timestamp of your last Foursquare checkin can be customised via the plugin's filters. See the *Filter Support And Usage* section for more information.
+The <em>strapline</em> text containing the venue name, venue URL and timestamp of your last Swarm checkin can be customised via the plugin's filters. See the *Filter Support And Usage* section for more information.
 
 The current version of this plugin allows you to associate a single Foursquare account with your WordPress site; associating multiple Foursquare accounts, one per user account is not currently supported.
 
@@ -38,7 +38,7 @@ The current version of this plugin allows you to associate a single Foursquare a
 1. Or you can install WP Quadratum manually. Download the plugin Zip archive and uncompress it. Copy or upload the `wp-quadratum` folder to the `wp-content/plugins` folder on your web server.
 1. Activate the plugin. From the Dashboard, navigate to Plugins and click on the *"Activate"* link under the entry for WP Quadratum.
 1. Configure your Foursquare credentials; from the Dashboard, navigate to the *Settings / WP Quadratum* page or click on the *"Settings"* link from the Plugins page on the Dashboard.
-1. To display your Foursquare checkins, WP Quadratum needs to be authorised to access your Foursquare account information; this is a simple, safe and secure 3 step process. WP Quadratum never sees your account login information and cannot store any personally identifiable information.
+1. To display your Swarm checkins, WP Quadratum needs to be authorised to access your Foursquare account information; this is a simple, safe and secure 3 step process. WP Quadratum never sees your account login information and cannot store any personally identifiable information.
 	1. Register your WordPress site as a Foursquare application on the [Foursquare App Registration](https://foursquare.com/developers/register) page. If you're not currently logged into your Foursquare account, you'll need to login with the Foursquare account whose checkins you want WP Quadratum to display. The *Your app name* field is a label you want to use to identify this connection to your Foursquare account. The *Download / welcome page url* is the URL of your Wordpress site. The *Redirect URI* will be provided for you and will be along the lines of `http://www.yoursite.com/wp-content/plugins/wp-quadratum/includes/wp-quadratum-callback.php` (this is just an example, *don't use this URL*). *Push API Notifications* should be set to *Disable pushes to this app*. All other fields can be left at their default values. Once you have successfully registered your site, you'll be provided with two keys, the *Client ID* and the *Client Secret*.
 	1. Copy and paste the supplied *Client ID* and *Client Secret* into the respective WP Quadratum setting fields. Click on the *"Save Changes"* button to preserve them.
 	1. You should now be authorised and ready to go; click on the *Connect to Foursquare* button.
@@ -96,7 +96,13 @@ WP Quadratum is named after both the Latin words *quattor*, meaning **four** and
 
 == Changelog ==
 
-The current version is 1.3.1.3 (2014.07.09)
+The current version is 1.3.1.4 (2015.02.05)
+
+= 1.3.1.4 =
+* Released 2015.02.05
+* Fixed: Updated venue category icon handling to correctly display venue icons
+* Changed: Refer to checkins as Swarm checkins and not Foursquare checkins
+* Removed: Locally cached category icons
 
 = 1.3.1.3 =
 * Released: 2014.07.09
@@ -164,11 +170,15 @@ Fixed: An issue with an old version of WP_PluginBase, the PHP class which WP Qua
 * First version of WP Quadratum released
 
 == Upgrade Notice ==
+
+= 1.3.1.4 =
+Updated venue category icon handling to correctly display venue icons and refer to checkins as Swarm checkins and not Foursquare checkins
+
 = 1.3.1.3 =
-* Updated category icon handling in line with Foursquare API changes and added black and white cached icons
+Updated category icon handling in line with Foursquare API changes and added black and white cached icons
 
 = 1.3.1.2 =
-* Updated Foursquare `DATEVERIFIED` version parameter to prevent API calls verified prior to `20120609` being rejected.
+Updated Foursquare `DATEVERIFIED` version parameter to prevent API calls verified prior to `20120609` being rejected.
 
 = 1.3.1.1 =
 Fixed bug in checking for when the `[wp_quadratum_map]` and `[wpq_map]` shortcodes are enabled. Updated Factual PHP driver to latest version.
